@@ -1,4 +1,3 @@
-import { refresh } from "../controllers/refresh.controller.js";
 import { User } from "../generated/prisma/client.js";
 import { UserRepository } from "../repositories/user.repository.js";
 import { PasswordService } from "./password.service.js";
@@ -26,7 +25,7 @@ export class UserService {
     const passwordHash = await this.passwordService.hashPassword(password);
     // create new user
     return this.userRepository.createUser({ email, password: passwordHash });
-  }
+  };
 
   //   UPDATE USER DATA
   update = async (data: UserInput) => {
@@ -42,10 +41,10 @@ export class UserService {
     } else {
       throw new Error("Email is not registered");
     }
-  }
+  };
 
   //   LOGIN USER
-   login = async (data: UserInput): Promise<TokenCredentials> => {
+  login = async (data: UserInput): Promise<TokenCredentials> => {
     // unpack credentials
     const { email, password } = data;
     // get registered user
@@ -69,7 +68,7 @@ export class UserService {
       accessToken,
       refreshToken
     };
-  }
+  };
 
   // refresh token service
   refresh = async (refreshToken: string): Promise<TokenCredentials> => {
