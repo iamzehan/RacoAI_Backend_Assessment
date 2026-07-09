@@ -16,13 +16,9 @@ export class TokenService {
   verifyJWT = (token: string, category: Token) => {
     const secret =
       category === "refresh" ? env.JWT_REFRESH_SECRET : env.JWT_SECRET;
-    try {
-      const payload = jwt.verify(token, secret) as {
-        sub: string;
-      };
-      return payload;
-    } catch {
-      return false;
-    }
+    const payload = jwt.verify(token, secret) as {
+      sub: string;
+    };
+    return payload;
   };
 }
