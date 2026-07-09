@@ -17,26 +17,6 @@ app.use(helmet());
 app.use(compression());
 app.use(morgan("dev"));
 
-// base route shows a welcome message DELETE THIS you don't need it //
-app.use("/", (req, res, next) => {
-    res.send(
-    `
-        <h1 
-            style='margin:0; height: 100%;
-            display: flex; 
-            place-items: center;
-            place-content: center;
-            background: #242424;
-            color: white;'
-        >
-
-                Welcome to TS x Express Template
-        
-        </h1>
-    `
-);
-} );
-
 // api routes
 app.use("/api", routes);
 
