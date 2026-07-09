@@ -1,25 +1,24 @@
 import { Request, Response } from "express";
 import { AuthService } from "../services/auth.service.js";
-
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { HttpStatus } from "../utils/constants.js";
 // Authentication Controller
 export class AuthController {
   constructor(private userService: AuthService) {}
 
   // Register credentials
   register = async (req: Request, res: Response) => {
-    const data: UserInput = req.body;
+    const data: UserInfo = req.body;
     // try creating credentials
     try {
       const credentials = await this.userService.register(data);
-      res.status(201).json({
-        status: "success",
-        message: "User creation was successful"
-      });
+      res
+        .status(HttpStatus.CREATED)
+        .json(ApiResponse.success("User creation was successful"));
     } catch {
-      res.status(409).json({
-        status: "error",
-        message: "User with this email already exists."
-      });
+      res
+        .status(HttpStatus.CONFLICT)
+        .json(ApiResponse.error("User with this email already exists."));
     }
   };
 
@@ -33,6 +32,7 @@ export class AuthController {
 
     // http cookie response with credentials
     res
+      .status(HttpStatus.OK)
       .cookie("accessToken", credentials.accessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
@@ -45,13 +45,15 @@ export class AuthController {
         sameSite: "strict",
         maxAge: 30 * 24 * 60 * 60 * 1000
       })
+
       .json(credentials.user);
   };
 
+  // Logout and clear cookie
   logout = (req: Request, res: Response) => {
     res
-    .clearCookie("accessToken")
-    .clearCookie("refreshToken")
-    .sendStatus(204);
-  }
+      .clearCookie("accessToken")
+      .clearCookie("refreshToken")
+      .sendStatus(HttpStatus.NO_CONTENT);
+  };
 }
