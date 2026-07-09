@@ -1,9 +1,9 @@
-import { User } from "../generated/prisma/client.js";
+import { User as type, User} from "../generated/prisma/client.js";
 import { UserRepository } from "../repositories/user.repository.js";
 import { PasswordService } from "./password.service.js";
 import { TokenService } from "./token.service.js";
 
-export class UserService {
+export class AuthService {
   constructor(
     private userRepository: UserRepository,
     private passwordService: PasswordService,
