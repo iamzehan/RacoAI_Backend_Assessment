@@ -44,3 +44,23 @@ export { Prisma }
  * 
  */
 export type User = Prisma.UserModel
+/**
+ * Model Product
+ * 
+ */
+export type Product = Prisma.ProductModel
+/**
+ * Model Categories
+ * 
+ */
+export type Categories = Prisma.CategoriesModel
+/**
+ * Model CategoriesOnProducts
+ * 
+ */
+export type CategoriesOnProducts = Prisma.CategoriesOnProductsModel
+/**
+ * Model Stock
+ * 
+ */
+export type Stock = Prisma.StockModel

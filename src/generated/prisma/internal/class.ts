@@ -20,7 +20,7 @@ const config: runtime.GetPrismaClientConfig = {
   "clientVersion": "7.2.0",
   "engineVersion": "0c8ef2ce45c83248ab3df073180d5eda9e8be7a3",
   "activeProvider": "postgresql",
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel User {\n  id        String   @id @default(uuid())\n  email     String   @unique\n  username  String   @unique\n  firstName String\n  lastName  String\n  password  String\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n",
+  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\n// For user\nmodel User {\n  id        String   @id @default(uuid())\n  email     String   @unique\n  username  String   @unique\n  firstName String\n  lastName  String\n  password  String\n  role      Role     @default(USER)\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n\nenum Role {\n  USER @map(\"user\")\n\n  ADMIN @map(\"admin\")\n\n  SUPER_ADMIN @map(\"super_admin\")\n\n  @@map(\"user_roles_enum\")\n}\n\n// For product\nmodel Product {\n  id          String                 @id @default(uuid())\n  sku         String                 @unique\n  name        String\n  description String\n  price       String\n  status      ProductStatus          @default(ACTIVE)\n  categories  CategoriesOnProducts[]\n  stock       Stock?\n  createdAt   DateTime               @default(now())\n  updatedAt   DateTime               @updatedAt\n}\n\nenum ProductStatus {\n  ACTIVE   @map(\"active\")\n  INACTIVE @map(\"inactive\")\n\n  @@map(\"product_status_enum\")\n}\n\nmodel Categories {\n  id          String                 @id @default(uuid())\n  name        String                 @unique\n  description String?\n  createdAt   DateTime               @default(now())\n  updatedAt   DateTime               @updatedAt\n  products    CategoriesOnProducts[]\n}\n\nmodel CategoriesOnProducts {\n  product    Product    @relation(fields: [productId], references: [id])\n  productId  String\n  categories Categories @relation(fields: [categoryId], references: [id])\n  categoryId String\n\n  @@id([productId, categoryId])\n}\n\nmodel Stock {\n  id        String  @id @default(uuid())\n  quantity  Int     @default(0)\n  product   Product @relation(fields: [productId], references: [id])\n  productId String  @unique\n}\n",
   "runtimeDataModel": {
     "models": {},
     "enums": {},
@@ -28,7 +28,7 @@ const config: runtime.GetPrismaClientConfig = {
   }
 }
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"username\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"firstName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"lastName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"password\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"username\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"firstName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"lastName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"password\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"role\",\"kind\":\"enum\",\"type\":\"Role\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"Product\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"sku\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"price\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"enum\",\"type\":\"ProductStatus\"},{\"name\":\"categories\",\"kind\":\"object\",\"type\":\"CategoriesOnProducts\",\"relationName\":\"CategoriesOnProductsToProduct\"},{\"name\":\"stock\",\"kind\":\"object\",\"type\":\"Stock\",\"relationName\":\"ProductToStock\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"Categories\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"products\",\"kind\":\"object\",\"type\":\"CategoriesOnProducts\",\"relationName\":\"CategoriesToCategoriesOnProducts\"}],\"dbName\":null},\"CategoriesOnProducts\":{\"fields\":[{\"name\":\"product\",\"kind\":\"object\",\"type\":\"Product\",\"relationName\":\"CategoriesOnProductsToProduct\"},{\"name\":\"productId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"categories\",\"kind\":\"object\",\"type\":\"Categories\",\"relationName\":\"CategoriesToCategoriesOnProducts\"},{\"name\":\"categoryId\",\"kind\":\"scalar\",\"type\":\"String\"}],\"dbName\":null},\"Stock\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"quantity\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"product\",\"kind\":\"object\",\"type\":\"Product\",\"relationName\":\"ProductToStock\"},{\"name\":\"productId\",\"kind\":\"scalar\",\"type\":\"String\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
 
 async function decodeBase64AsWasm(wasmBase64: string): Promise<WebAssembly.Module> {
   const { Buffer } = await import('node:buffer')
@@ -183,6 +183,46 @@ export interface PrismaClient<
     * ```
     */
   get user(): Prisma.UserDelegate<ExtArgs, { omit: OmitOpts }>;
+
+  /**
+   * `prisma.product`: Exposes CRUD operations for the **Product** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Products
+    * const products = await prisma.product.findMany()
+    * ```
+    */
+  get product(): Prisma.ProductDelegate<ExtArgs, { omit: OmitOpts }>;
+
+  /**
+   * `prisma.categories`: Exposes CRUD operations for the **Categories** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Categories
+    * const categories = await prisma.categories.findMany()
+    * ```
+    */
+  get categories(): Prisma.CategoriesDelegate<ExtArgs, { omit: OmitOpts }>;
+
+  /**
+   * `prisma.categoriesOnProducts`: Exposes CRUD operations for the **CategoriesOnProducts** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more CategoriesOnProducts
+    * const categoriesOnProducts = await prisma.categoriesOnProducts.findMany()
+    * ```
+    */
+  get categoriesOnProducts(): Prisma.CategoriesOnProductsDelegate<ExtArgs, { omit: OmitOpts }>;
+
+  /**
+   * `prisma.stock`: Exposes CRUD operations for the **Stock** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Stocks
+    * const stocks = await prisma.stock.findMany()
+    * ```
+    */
+  get stock(): Prisma.StockDelegate<ExtArgs, { omit: OmitOpts }>;
 }
 
 export function getPrismaClientClass(): PrismaClientConstructor {
