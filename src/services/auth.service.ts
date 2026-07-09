@@ -11,9 +11,9 @@ export class AuthService {
   ) {}
 
   //   REGISTER USER
-  register = async (data: UserInput) => {
+  register = async (data: UserInfo) => {
     // unpack credentials
-    const { email, password } = data;
+    const { email, password, username, firstName, lastName } = data;
     // Check if email exists
     const existing = await this.userRepository.findByEmail(email);
     if (existing) {
@@ -24,27 +24,27 @@ export class AuthService {
     // hash password
     const passwordHash = await this.passwordService.hashPassword(password);
     // create new user
-    return this.userRepository.createUser({ email, password: passwordHash });
+    return this.userRepository.createUser({ email, password: passwordHash, username, firstName, lastName });
   };
 
   //   UPDATE USER DATA
-  update = async (data: UserInput) => {
+  update = async (data: UserInfo) => {
     // unpack credentials
-    const { email, password } = data;
+    const { email, password, username, firstName, lastName } = data;
     // Check if email exists
     const existing = await this.userRepository.findByEmail(email);
     if (existing) {
       // hash password
       const passwordHash = await this.passwordService.hashPassword(password);
       // create new user
-      return this.userRepository.createUser({ email, password: passwordHash });
+      return this.userRepository.createUser({ email, password: passwordHash, username, firstName, lastName });
     } else {
       throw new Error("Email is not registered");
     }
   };
 
   //   LOGIN USER
-  login = async (data: UserInput): Promise<TokenCredentials> => {
+  login = async (data: UserInfo): Promise<TokenCredentials> => {
     // unpack credentials
     const { email, password } = data;
     // get registered user
