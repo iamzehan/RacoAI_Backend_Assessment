@@ -13,18 +13,13 @@ datasource db {
   provider = "postgresql"
 }
 
-// Session 
-model Session {
-  id        String    @id @default(cuid())
-  sid       String    @unique
-  data      String
-  expiresAt DateTime
-}
-
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(uuid())
+  email       String   @unique
+  username    String   @unique
+  firstName   String
+  lastName    String
+  password    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
