@@ -1,14 +1,14 @@
 import { Request, Response } from "express";
-import { UserService } from "../services/auth.service.js";
+import { AuthService } from "../services/auth.service.js";
 
-class RefreshController {
-  constructor(private userService: UserService) {}
+export class RefreshController {
+  constructor(private authService: AuthService) {}
 
   refresh = async (req: Request, res: Response) => {
-    const token = req.session.refreshToken;
+    const token = req.headers.authorization?.split(" ")[1];
     if (!token) return res.sendStatus(401);
     try {
-      const credentials = await this.userService.refresh(token);
+      const credentials = await this.authService.refresh(token);
       // http cookie response with credentials
       res
         .cookie("accessToken", credentials.accessToken, {
