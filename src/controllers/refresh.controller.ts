@@ -1,12 +1,13 @@
 import { Request, Response } from "express";
 import { AuthService } from "../services/auth.service.js";
+import { HttpStatus } from "../utils/constants.js";
 
 export class RefreshController {
   constructor(private authService: AuthService) {}
 
   refresh = async (req: Request, res: Response) => {
     const token = req.headers.authorization?.split(" ")[1];
-    if (!token) return res.sendStatus(401);
+    if (!token) return res.sendStatus(HttpStatus.UNAUTHORIZED);
     try {
       const credentials = await this.authService.refresh(token);
       // http cookie response with credentials
@@ -25,7 +26,7 @@ export class RefreshController {
         })
         .json(credentials.user);
     } catch (err) {
-      res.status(401).json({ message: err });
+      res.status(HttpStatus.UNAUTHORIZED).json({ message: err });
     }
   };
 }
