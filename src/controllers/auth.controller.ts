@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import { UserService } from "../services/auth.service.js";
+import { AuthService } from "../services/auth.service.js";
 
-// User Controller
-export class UserController {
-  constructor(private userService: UserService) {}
+// Authentication Controller
+export class AuthController {
+  constructor(private userService: AuthService) {}
 
   // Register credentials
   register = async (req: Request, res: Response) => {
