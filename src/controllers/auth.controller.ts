@@ -47,4 +47,11 @@ export class AuthController {
       })
       .json(credentials.user);
   };
+
+  logout = (req: Request, res: Response) => {
+    res
+    .clearCookie("accessToken")
+    .clearCookie("refreshToken")
+    .sendStatus(204);
+  }
 }
