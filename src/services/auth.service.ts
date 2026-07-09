@@ -12,7 +12,7 @@ export class UserService {
   ) {}
 
   //   REGISTER USER
-  async register(data: UserInput) {
+  register = async (data: UserInput) => {
     // unpack credentials
     const { email, password } = data;
     // Check if email exists
@@ -29,7 +29,7 @@ export class UserService {
   }
 
   //   UPDATE USER DATA
-  async update(data: UserInput) {
+  update = async (data: UserInput) => {
     // unpack credentials
     const { email, password } = data;
     // Check if email exists
@@ -45,7 +45,7 @@ export class UserService {
   }
 
   //   LOGIN USER
-  async login(data: UserInput) {
+   login = async (data: UserInput): Promise<TokenCredentials> => {
     // unpack credentials
     const { email, password } = data;
     // get registered user
@@ -59,15 +59,42 @@ export class UserService {
       throw new Error("Invalid Credentials!");
     }
     // get JWT Tokens
-    const accessToken = this.tokenService.signAccessToken(user.id)
-    const refreshToken = this.tokenService.signRefreshToken(user.id)
+    const accessToken = this.tokenService.signAccessToken(user.id);
+    const refreshToken = this.tokenService.signRefreshToken(user.id);
     return {
-        user: {
-            userId: user.id,
-            email
-        },
-        accessToken,
-        refreshToken
-    }
+      user: {
+        userId: user.id,
+        email
+      },
+      accessToken,
+      refreshToken
+    };
   }
+
+  // refresh token service
+  refresh = async (refreshToken: string): Promise<TokenCredentials> => {
+    // verify refresh token
+    const payload = this.tokenService.verifyJWT(refreshToken, "refresh");
+    if (payload) {
+      // find user
+      const user = await this.userRepository.findById(payload.sub);
+      // sign access & refresh token
+      if (user) {
+        const access = this.tokenService.signAccessToken(user.id);
+        const refresh = this.tokenService.signRefreshToken(user.id);
+        return {
+          user: {
+            userId: user.id,
+            email: user.email
+          },
+          accessToken: access,
+          refreshToken: refresh
+        };
+      } else {
+        throw new Error("Refresh failed!");
+      }
+    } else {
+      throw new Error("Token might be expired!");
+    }
+  };
 }
