@@ -12,3 +12,13 @@ interface TokenCredentials{
     accessToken: string;
     refreshToken: string;
 }
+
+// User Profile
+
+interface Profile {
+    id?: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    username: string;
+}
