@@ -10,7 +10,7 @@ export class UserController {
     const userId = req.userId;
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
     try {
-      const profile = this.userService.profile(userId);
+      const profile = await this.userService.profile(userId);
       return res.status(200).json(profile);
     } catch (error) {
       return res.status(404).json({ message: error });
