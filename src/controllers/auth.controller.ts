@@ -1,34 +1,50 @@
 import { Request, Response } from "express";
-import { prisma } from "../config/prisma.js";
-import { hashPassword, comparePassword } from "../utils/password.js";
-import { signAccessToken, signRefreshToken } from "../utils/jwt.js";
+import { UserService } from "../services/auth.service.js";
 
-export const register = async (req: Request, res: Response) => {
-  const { email, password } = req.body;
+// User Controller
+export class UserController {
+  constructor(private userService: UserService) {}
 
-  const user = await prisma.user.create({
-    data: {
-      email,
-      password: await hashPassword(password)
+  // Register credentials
+  register = async (req: Request, res: Response) => {
+    const data: UserInput = req.body;
+    // try creating credentials
+    try {
+      const credentials = await this.userService.register(data);
+      res.status(201).json({
+        status: "success",
+        message: "User creation was successful"
+      });
+    } catch {
+      res.status(409).json({
+        status: "error",
+        message: "User with this email already exists."
+      });
     }
-  });
+  };
 
-  res.status(201).json({ id: user.id });
-};
+  // Login credentials
+  login = async (req: Request, res: Response) => {
+    // form data / request body
+    const data = req.body;
 
-export const login = async (req: Request, res: Response) => {
-  const { email, password } = req.body;
+    // user login
+    const credentials = await this.userService.login(data);
 
-  const user = await prisma.user.findUnique({ where: { email } });
-  if (!user || !(await comparePassword(password, user.password))) {
-    return res.status(401).json({ message: "Invalid credentials" });
-  }
-
-  const accessToken = signAccessToken(user.id);
-  const refreshToken = signRefreshToken(user.id);
-
-  req.session.userId = user.id;
-  req.session.refreshToken = refreshToken;
-
-  res.json({ accessToken });
-};
+    // http cookie response with credentials
+    res
+      .cookie("accessToken", credentials.accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 15 * 60 * 1000
+      })
+      .cookie("refreshToken", credentials.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 30 * 24 * 60 * 60 * 1000
+      })
+      .json(credentials.user);
+  };
+}
