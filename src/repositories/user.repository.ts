@@ -4,6 +4,15 @@ import { User } from "../generated/prisma/client.js";
 // user repo
 export class UserRepository {
   constructor() {}
+  // find by userId if exists
+  async findById(userId: string) {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId
+      }
+    });
+    return user;
+  }
   // find user by email if exists
   async findByEmail(email: string) {
     const user = await prisma.user.findUnique({
