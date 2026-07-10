@@ -1,3 +1,5 @@
+import { Role } from "../generated/prisma/enums.ts";
+
 interface UserInfo {
     firstName: string;
     lastName: string;
@@ -15,4 +17,5 @@ interface Profile {
     lastName: string;
     email: string;
     username: string;
+    role: Role
 }
