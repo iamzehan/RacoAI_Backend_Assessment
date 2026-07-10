@@ -4,7 +4,7 @@ import { Router } from "express";
 import authRoutes from "./auth.routes.js";
 
 // version 1 api routes
-import v1 from "./v1/index.js";
+import v1 from "./v1/_index.js";
 
 const router = Router();
 
