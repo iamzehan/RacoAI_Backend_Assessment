@@ -1,4 +1,5 @@
 import { UserRepository } from "../repositories/user.repository.js";
+import { Profile } from "../types/user.js";
 
 export class UserService {
   constructor(private userRepository: UserRepository) {}
@@ -11,7 +12,8 @@ export class UserService {
       email: user?.email,
       username: user?.username,
       firstName: user?.firstName,
-      lastName: user?.lastName
+      lastName: user?.lastName,
+      role: user?.role
     };
   };
 }
