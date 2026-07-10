@@ -1,6 +1,5 @@
 // import prisma from config
 import { prisma } from "../config/prisma.js";
-import { User } from "../generated/prisma/client.js";
 // user repo
 export class UserRepository {
   constructor() {}
@@ -21,13 +20,13 @@ export class UserRepository {
     return user;
   }
   // create user
-  async createUser(data: UserInput) {
+  async createUser(data: UserInfo) {
     return prisma.user.create({
       data
     });
   }
   // update user
-  async updateUser(data: UserInput) {
+  async updateUser(data: UserInfo) {
     const { email, password } = data;
     return prisma.user.update({
       where: {
