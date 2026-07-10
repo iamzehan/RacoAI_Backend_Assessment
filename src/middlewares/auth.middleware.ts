@@ -1,40 +1,96 @@
 import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
-import { env } from "../config/env.js";
 import { TokenService } from "../services/token.service.js";
+import { UserService } from "../services/user.service.js";
+import { HttpStatus } from "../utils/constants.js";
 
 export class AuthenticationMiddleware {
-  constructor(private tokenService: TokenService) {}
+  constructor(
+    private tokenService: TokenService,
+    private userService: UserService
+  ) {}
 
-  // Route Requires authentication
+  private getToken(req: Request): string | null {
+    return req.headers.authorization?.split(" ")[1] ?? null;
+  }
+
+  private verifyToken(req: Request) {
+    const token = this.getToken(req);
+    if (!token) return null;
+
+    try {
+      return this.tokenService.verifyJWT(token, "access");
+    } catch {
+      return null;
+    }
+  }
+
+  private async attachUser(req: Request) {
+    const payload = this.verifyToken(req);
+    if (!payload) return null;
+
+    req.userId = payload.sub;
+
+    const user = await this.userService.profile(payload.sub);
+    if (!user) return null;
+
+    req.userRole = user.role;
+
+    return user;
+  }
+
+  /**
+   * Authentication Required
+   */
   requireAuth = (req: Request, res: Response, next: NextFunction) => {
-    const token = req.headers.authorization?.split(" ")[1];
-    if (!token) return res.sendStatus(401);
+    const payload = this.verifyToken(req);
 
-    try {
-      const payload = this.tokenService.verifyJWT(token, "access");
-      req.userId = payload.sub;
-      next();
-    } catch {
-      res.sendStatus(401);
+    if (!payload) {
+      return res.sendStatus(HttpStatus.UNAUTHORIZED);
     }
+
+    req.userId = payload.sub;
+
+    next();
   };
-  // Ensure user is a guest
+
+  /**
+   * Only Guests
+   */
   ensureGuest = (req: Request, res: Response, next: NextFunction) => {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) return next(); // No token → guest allowed
+    const payload = this.verifyToken(req);
 
-    const token = authHeader.split(" ")[1];
-    if (!token) return next();
-
-    try {
-      const payload = this.tokenService.verifyJWT(token, "access");
-      if (payload.sub) {
-        return res.status(403).json({ message: "Already authenticated" });
-      }
-      next();
-    } catch {
-      next(); // Invalid token → treat as guest
+    if (payload) {
+      return res
+        .status(HttpStatus.FORBIDDEN)
+        .json({ message: "Already authenticated" });
     }
+
+    next();
+  };
+
+  /**
+   * Attach user information if authenticated.
+   * Never blocks the request.
+   */
+  ensureRole = async (req: Request, res: Response, next: NextFunction) => {
+    await this.attachUser(req);
+    next();
+  };
+
+  /**
+   * Admin Only
+   */
+  ensureAdmin = async (req: Request, res: Response, next: NextFunction) => {
+    const user = await this.attachUser(req);
+
+    if (!user) {
+      return res.sendStatus(HttpStatus.UNAUTHORIZED);
+    }
+
+    if (user.role !== "admin") {
+      return res.sendStatus(HttpStatus.FORBIDDEN);
+    }
+
+    next();
   };
 }
