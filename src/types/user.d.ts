@@ -7,16 +7,6 @@ interface UserInfo {
     password: string;
 }
 
-// Token Credentials sent as cookie
-interface TokenCredentials{
-    user: {
-        userId: string;
-        email: string;
-    },
-    accessToken: string;
-    refreshToken: string;
-}
-
 // User Profile
 
 interface Profile {
