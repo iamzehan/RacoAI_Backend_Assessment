@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { AuthService } from "../services/auth.service.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { HttpStatus } from "../utils/constants.js";
+import { UserInfo } from "../types/user.js";
 // Authentication Controller
 export class AuthController {
   constructor(private userService: AuthService) {}
@@ -26,10 +27,12 @@ export class AuthController {
   login = async (req: Request, res: Response) => {
     // form data / request body
     const data = req.body;
+    
 
     // user login
     const credentials = await this.userService.login(data);
 
+    console.log(credentials)
     // http cookie response with credentials
     res
       .status(HttpStatus.OK)
