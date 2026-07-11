@@ -1,5 +1,6 @@
 // import prisma from config
 import { prisma } from "../config/prisma.js";
+import { UserInfo } from "../types/user.js";
 // user repo
 export class UserRepository {
   constructor() {}
