@@ -31,8 +31,7 @@ export class AuthController {
 
     // user login
     const credentials = await this.userService.login(data);
-
-    console.log(credentials)
+    
     // http cookie response with credentials
     res
       .status(HttpStatus.OK)
