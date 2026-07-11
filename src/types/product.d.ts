@@ -1,10 +1,19 @@
 import { Categories, Product, Stock } from "../generated/prisma/client.ts";
 import { ProductStatus } from "../generated/prisma/client.ts";
 
-interface ProductQuery {
+export interface ProductQuery {
   page?: number;
   limit?: number;
-  status? : ProductStatus
+
+  status?: ProductStatus;
+
+  category?: string;
+  search?: string;
+
+  minPrice?: number;
+  maxPrice?: number;
+
+  sort?: string;
 }
 
 interface ProductData extends Product {

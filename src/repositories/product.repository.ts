@@ -1,7 +1,9 @@
 // import prisma from config
 import { prisma } from "../config/prisma.js";
+import { ProductWhereInput } from "../generated/prisma/models.js";
 import { ProductData, ProductQuery } from "../types/product.js";
 import generateSKU from "../utils/generateSKU.js";
+import { parsePrismaOrderBy } from "../utils/lib.js";
 
 export class ProductRepository {
   constructor() {}
@@ -59,43 +61,89 @@ export class ProductRepository {
     return createdProduct;
   };
 
-  // get all products (READ)
-  allProducts = async ({ page, limit, status }: ProductQuery = {}) => {
-    // where clause set according to status (Admin can access all status / user can only access active)
-    const where = status ? { status } : {};
+  // find products by filter
+  findProducts = async ({
+    page,
+    limit,
+    status,
+    category,
+    search,
+    sort
+  }: ProductQuery = {}) => {
+    const where: ProductWhereInput = {};
 
-    // Should this paginate?
+    if (status) {
+      where.status = status;
+    }
+
+    if (search) {
+      where.OR = [
+        {
+          name: {
+            contains: search,
+            mode: "insensitive"
+          }
+        },
+        {
+          description: {
+            contains: search,
+            mode: "insensitive"
+          }
+        }
+      ];
+    }
+
+    if (category) {
+      where.categories = {
+        some: {
+          categories: {
+            name: {
+              equals: category,
+              mode: "insensitive"
+            }
+          }
+        }
+      };
+    }
+
+    const orderBy = sort ? parsePrismaOrderBy(sort) : undefined;
+
     const shouldPaginate =
       page !== undefined && limit !== undefined && page > 0 && limit > 0;
 
-    // calculate total
-    const total = await prisma.product.count({ where });
+    const [products, total] = await prisma.$transaction([
+      prisma.product.findMany({
+        where,
+        orderBy,
+        include: {
+          stock: true,
+          categories: {
+            include: {
+              categories: true
+            }
+          }
+        },
+        ...(shouldPaginate && {
+          skip: (page - 1) * limit,
+          take: limit
+        })
+      }),
 
-    // get products accordingly
-    const products = await prisma.product.findMany({
-      where,
-      include: {
-        categories: true
-      },
-      ...(shouldPaginate && {
-        skip: (page - 1) * limit,
-        take: limit
-      })
-    });
+      prisma.product.count({ where })
+    ]);
 
-    // return with pagination metadata
     return {
       data: products,
-      pagination:
-        page && limit
-          ? {
-              page,
-              limit,
-              total,
-              totalPages: Math.ceil(total / limit),
-              hasNextPage: page * limit < total
-            }
-          : null
+      pagination: shouldPaginate
+        ? {
+            page,
+            limit,
+            total,
+            totalPages: Math.ceil(total / limit),
+            hasNextPage: page * limit < total,
+            hasPreviousPage: page > 1
+          }
+        : null
     };
   };
 

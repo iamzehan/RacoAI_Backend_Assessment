@@ -21,7 +21,7 @@ export class ProductService {
    * Get products with optional pagination and status filter.
    */
   read = async (query: ProductQuery = {}) => {
-    const products = await this.productRepo.allProducts(query);
+    const products = await this.productRepo.findProducts(query);
 
     if (products.data.length === 0) {
       throw new Error("No products found.");
@@ -82,7 +82,7 @@ export class ProductService {
       deleted: result.count
     };
   };
-  
+
   /**
    * Generate a unique product SKU.
    */

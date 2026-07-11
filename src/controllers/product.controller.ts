@@ -12,41 +12,43 @@ export class ProductController {
    */
   getProducts = async (req: Request, res: Response) => {
     try {
-      const page = req.query.page
-        ? Number(req.query.page)
-        : undefined;
-
-      const limit = req.query.limit
-        ? Number(req.query.limit)
-        : undefined;
+      const { page, limit, category, search, sort } = req.query;
 
       const userRole = req.userRole as Role;
-      console.log(userRole)
+
+      // Only admins can view all products.
+      // Everyone else only sees ACTIVE products.
       const status =
-        (userRole === Role.ADMIN
-          ? undefined
-          : ProductStatus.ACTIVE);
+        userRole === Role.ADMIN
+          ? (req.query.status as ProductStatus | undefined)
+          : ProductStatus.ACTIVE;
+
       const products = await this.productService.read({
-        page,
-        limit,
+        page: page ? Number(page) : undefined,
+        limit: limit ? Number(limit) : undefined,
         status,
+        category: category as string | undefined,
+        search: search as string | undefined,
+        sort: sort as string | undefined
       });
 
-      return res.status(HttpStatus.OK).json(
-        ApiResponse.success(
-          "Retrieved products successfully.",
-          products
-        )
-      );
+      return res
+        .status(HttpStatus.OK)
+        .json(
+          ApiResponse.success("Retrieved products successfully.", products)
+        );
     } catch (error) {
-      console.log(error)
-      return res.status(HttpStatus.BAD_REQUEST).json(
-        ApiResponse.error(
-          error instanceof Error
-            ? error.message
-            : "Failed to retrieve products."
-        )
-      );
+      console.error(error);
+
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json(
+          ApiResponse.error(
+            error instanceof Error
+              ? error.message
+              : "Failed to retrieve products."
+          )
+        );
     }
   };
 
@@ -57,20 +59,17 @@ export class ProductController {
     try {
       const sku = await this.productService.createSKU();
 
-      return res.status(HttpStatus.OK).json(
-        ApiResponse.success(
-          "SKU generated successfully.",
-          { sku }
-        )
-      );
+      return res
+        .status(HttpStatus.OK)
+        .json(ApiResponse.success("SKU generated successfully.", { sku }));
     } catch (error) {
-      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(
-        ApiResponse.error(
-          error instanceof Error
-            ? error.message
-            : "Failed to generate SKU."
-        )
-      );
+      return res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(
+          ApiResponse.error(
+            error instanceof Error ? error.message : "Failed to generate SKU."
+          )
+        );
     }
   };
 
@@ -81,94 +80,84 @@ export class ProductController {
     try {
       const product = await this.productService.create(req.body);
 
-      return res.status(HttpStatus.CREATED).json(
-        ApiResponse.success(
-          "Product created successfully.",
-          product
-        )
-      );
+      return res
+        .status(HttpStatus.CREATED)
+        .json(ApiResponse.success("Product created successfully.", product));
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json(
-        ApiResponse.error(
-          error instanceof Error
-            ? error.message
-            : "Failed to create product."
-        )
-      );
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json(
+          ApiResponse.error(
+            error instanceof Error ? error.message : "Failed to create product."
+          )
+        );
     }
   };
   /**
- * Update a product.
- */
-updateProduct = async (req: Request, res: Response) => {
-  try {
-    const product = await this.productService.update(req.body);
+   * Update a product.
+   */
+  updateProduct = async (req: Request, res: Response) => {
+    try {
+      const product = await this.productService.update(req.body);
 
-    return res.status(HttpStatus.OK).json(
-      ApiResponse.success(
-        "Product updated successfully.",
-        product
-      )
-    );
-  } catch (error) {
-    return res.status(HttpStatus.BAD_REQUEST).json(
-      ApiResponse.error(
-        error instanceof Error
-          ? error.message
-          : "Failed to update product."
-      )
-    );
-  }
-};
+      return res
+        .status(HttpStatus.OK)
+        .json(ApiResponse.success("Product updated successfully.", product));
+    } catch (error) {
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json(
+          ApiResponse.error(
+            error instanceof Error ? error.message : "Failed to update product."
+          )
+        );
+    }
+  };
 
-/**
- * Delete a single product.
- */
-deleteProduct = async (req: Request, res: Response) => {
-  try {
-    const id = req.params.id.toString();
-    const result = await this.productService.deleteOne(id);
+  /**
+   * Delete a single product.
+   */
+  deleteProduct = async (req: Request, res: Response) => {
+    try {
+      const id = req.params.id.toString();
+      const result = await this.productService.deleteOne(id);
 
-    return res.status(HttpStatus.OK).json(
-      ApiResponse.success(
-        "Product deleted successfully.",
-        result
-      )
-    );
-  } catch (error) {
-    return res.status(HttpStatus.BAD_REQUEST).json(
-      ApiResponse.error(
-        error instanceof Error
-          ? error.message
-          : "Failed to delete product."
-      )
-    );
-  }
-};
+      return res
+        .status(HttpStatus.OK)
+        .json(ApiResponse.success("Product deleted successfully.", result));
+    } catch (error) {
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json(
+          ApiResponse.error(
+            error instanceof Error ? error.message : "Failed to delete product."
+          )
+        );
+    }
+  };
 
-/**
- * Delete multiple products.
- */
-deleteProducts = async (req: Request, res: Response) => {
-  try {
-    const { ids } = req.body;
+  /**
+   * Delete multiple products.
+   */
+  deleteProducts = async (req: Request, res: Response) => {
+    try {
+      const { ids } = req.body;
 
-    const result = await this.productService.deleteMany(ids);
+      const result = await this.productService.deleteMany(ids);
 
-    return res.status(HttpStatus.OK).json(
-      ApiResponse.success(
-        "Products deleted successfully.",
-        result
-      )
-    );
-  } catch (error) {
-    return res.status(HttpStatus.BAD_REQUEST).json(
-      ApiResponse.error(
-        error instanceof Error
-          ? error.message
-          : "Failed to delete products."
-      )
-    );
-  }
-};
+      return res
+        .status(HttpStatus.OK)
+        .json(ApiResponse.success("Products deleted successfully.", result));
+    } catch (error) {
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json(
+          ApiResponse.error(
+            error instanceof Error
+              ? error.message
+              : "Failed to delete products."
+          )
+        );
+    }
+  };
 }
