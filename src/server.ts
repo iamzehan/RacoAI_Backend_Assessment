@@ -11,3 +11,5 @@ async function bootstrap(){
     logger.info(`🚀 Server running on port ${env.PORT} visit: http://localhost:3000`);
   });
 }
+
+bootstrap();
