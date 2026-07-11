@@ -9,6 +9,8 @@ import { AuthService } from "./auth.service.js";
 import { PasswordService } from "./password.service.js";
 import { ProductService } from "./product.service.js";
 
+import RedisService from "./redis.service.js";
+
 // Services 
 const userService = new UserService(userRepository);
 const tokenService = new TokenService();
@@ -20,13 +22,17 @@ const authService = new AuthService(
 );
 const productService = new ProductService(productRepository);
 
+// redis
+const redisService = new RedisService();
+
 // Services collection
 const services = {
     userService,
     tokenService,
     authService,
     passwordService,
-    productService
+    productService,
+    redisService
 }
 
 export default services;
