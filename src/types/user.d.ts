@@ -19,3 +19,9 @@ interface Profile {
     username: string;
     role: Role
 }
+
+// User Login 
+interface UserLogin {
+    email: string;
+    password: string;
+}
