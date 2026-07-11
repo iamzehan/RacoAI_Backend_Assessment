@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { ProductService } from "../services/product.service.js";
-import { ProductStatus, Role } from "../generated/prisma/enums.js";
+import { ProductStatus, Role } from "../generated/prisma/client.js";
 import { HttpStatus } from "../utils/constants.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
@@ -20,17 +20,12 @@ export class ProductController {
         ? Number(req.query.limit)
         : undefined;
 
-      const requestedStatus =
-        req.query.status as ProductStatus | undefined;
-
       const userRole = req.userRole as Role;
-
+      console.log(userRole)
       const status =
-        requestedStatus ??
-        (userRole === "admin"
+        (userRole === Role.ADMIN
           ? undefined
           : ProductStatus.ACTIVE);
-
       const products = await this.productService.read({
         page,
         limit,
@@ -44,6 +39,7 @@ export class ProductController {
         )
       );
     } catch (error) {
+      console.log(error)
       return res.status(HttpStatus.BAD_REQUEST).json(
         ApiResponse.error(
           error instanceof Error
