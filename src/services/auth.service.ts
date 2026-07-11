@@ -1,7 +1,7 @@
 import { User as type, User} from "../generated/prisma/client.js";
 import { UserRepository } from "../repositories/user.repository.js";
 import { TokenCredentials } from "../types/credentials.js";
-import { UserInfo } from "../types/user.js";
+import { UserInfo, UserLogin } from "../types/user.js";
 import { PasswordService } from "./password.service.js";
 import { TokenService } from "./token.service.js";
 
@@ -46,7 +46,7 @@ export class AuthService {
   };
 
   //   LOGIN USER
-  login = async (data: UserInfo): Promise<TokenCredentials> => {
+  login = async (data: UserLogin): Promise<TokenCredentials> => {
     // unpack credentials
     const { email, password } = data;
     // get registered user
