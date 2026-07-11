@@ -10,17 +10,17 @@
 */
 
 export const Role = {
-  USER: 'user',
-  ADMIN: 'admin',
-  SUPER_ADMIN: 'super_admin'
+  USER: 'USER',
+  ADMIN: 'ADMIN',
+  SUPER_ADMIN: 'SUPER_ADMIN'
 } as const
 
 export type Role = (typeof Role)[keyof typeof Role]
 
 
 export const ProductStatus = {
-  ACTIVE: 'active',
-  INACTIVE: 'inactive'
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE'
 } as const
 
 export type ProductStatus = (typeof ProductStatus)[keyof typeof ProductStatus]
