@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
@@ -13,68 +7,67 @@ datasource db {
   provider = "postgresql"
 }
 
-// For user
 model User {
-  id          String   @id @default(uuid())
-  email       String   @unique
-  username    String   @unique
-  firstName   String
-  lastName    String
-  password    String
-  role        Role     @default(USER)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(uuid())
+  email     String   @unique
+  username  String   @unique
+  firstName String
+  lastName  String
+  password  String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-enum Role {
-  
-  USER @map("user")
-  
-  ADMIN @map("admin")
-  
-  SUPER_ADMIN @map("super_admin")
-
-  @@map("user_roles_enum")
-}
-
-// For product
 model Product {
-  id          String @id @default(uuid())
-  sku         String @unique
+  id          String                 @id @default(uuid())
+  sku         String                 @unique
   name        String
   description String
   price       String
-  status      ProductStatus @default(ACTIVE)
+  status      ProductStatus          @default(ACTIVE)
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
   categories  CategoriesOnProducts[]
   stock       Stock?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
 }
 
-enum ProductStatus {
-  ACTIVE      @map("active")
-  INACTIVE    @map("inactive")
-  @@map("product_status_enum")
-}
 model Categories {
-  id          String @id @default(uuid())
-  name        String @unique
+  id          String                 @id @default(uuid())
+  name        String                 @unique
   description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
   products    CategoriesOnProducts[]
 }
 
 model CategoriesOnProducts {
-  product     Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId   String
-  categories  Categories @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  categoryId  String
+  productId  String
+  categoryId String
+  categories Categories @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  product    Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+
   @@id([productId, categoryId])
-} 
+}
+
 model Stock {
-  id          String @id @default(uuid())
-  quantity    Int @default(0)
-  product     Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId   String @unique
+  id        String  @id @default(uuid())
+  quantity  Int     @default(0)
+  productId String  @unique
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+enum Role {
+  USER        @map("USER")
+  ADMIN       @map("ADMIN")
+  SUPER_ADMIN @map("SUPER_ADMIN")
+
+  @@map("user_roles_enum")
+}
+
+enum ProductStatus {
+  ACTIVE   @map("ACTIVE")
+  INACTIVE @map("INACTIVE")
+
+  @@map("product_status_enum")
 }
