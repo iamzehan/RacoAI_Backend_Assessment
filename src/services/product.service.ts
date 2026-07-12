@@ -1,8 +1,15 @@
 import { ProductRepository } from "../repositories/product.repository.js";
 import { ProductData, ProductQuery } from "../types/product.js";
+import { CacheKey } from "../utils/cache-key.js";
+import { CacheTTL } from "../utils/constants.js";
+import RedisService from "./redis.service.js";
 
 export class ProductService {
-  constructor(private readonly productRepo: ProductRepository) {}
+  
+  constructor(
+    private readonly productRepo: ProductRepository,
+    private readonly redis: RedisService
+  ) {}
 
   /**
    * Create a product.
@@ -21,14 +28,49 @@ export class ProductService {
    * Get products with optional pagination and status filter.
    */
   read = async (query: ProductQuery = {}) => {
+    // first check the cache
+    const key = CacheKey.products(query);
+    const cached = await this.redis.get(key);
+    if(cached) {
+      // return cache if found
+      return cached;
+    }
+    // then go to the database for retrieval
     const products = await this.productRepo.findProducts(query);
-
     if (products.data.length === 0) {
       throw new Error("No products found.");
     }
-
+    // now set the cache to redis via redis service
+    await this.redis.set(key, products, CacheTTL.PRODUCTS);
+    
+    // return results
     return products;
   };
+
+  /**
+   * Get product details
+   */
+  async readOne(id: string) {
+    // Determin what key to look with
+    const key = CacheKey.product(id);
+
+    // go through cache
+    const cached = await this.redis.get(key);
+
+    // return cache if found
+    if (cached) return cached;
+
+    // get product from database if cache doesn't contain
+    const product = await this.productRepo.findOne(id);
+
+    // throw error if not found
+    if (!product) throw new Error("No details found!");
+
+    // set the cache
+    await this.redis.set(key, product, CacheTTL.PRODUCT);
+
+    return product;
+  }
 
   /**
    * Update a product.
