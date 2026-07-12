@@ -15,7 +15,7 @@ import RedisService from "./redis.service.js";
 // redis
 const redisService = new RedisService();
 
-// Services 
+// Services
 const userService = new UserService(userRepository);
 const tokenService = new TokenService();
 const passwordService = new PasswordService();
@@ -29,12 +29,13 @@ const categoryService = new CategoryService(categoryRepository);
 
 // Services collection
 const services = {
-    userService,
-    tokenService,
-    authService,
-    passwordService,
-    productService,
-    redisService
-}
+  redisService,
+  userService,
+  tokenService,
+  authService,
+  passwordService,
+  productService,
+  categoryService
+};
 
 export default services;
