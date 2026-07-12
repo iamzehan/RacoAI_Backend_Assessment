@@ -3,6 +3,7 @@ import { ProductService } from "../services/product.service.js";
 import { ProductStatus, Role } from "../generated/prisma/client.js";
 import { HttpStatus } from "../utils/constants.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import { Pagination } from "../utils/helpers.js";
 
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
@@ -12,7 +13,7 @@ export class ProductController {
    */
   getProducts = async (req: Request, res: Response) => {
     try {
-      const { page, limit, category, search, sort } = req.query;
+      let { category, search, sort } = req.query;
 
       const userRole = req.userRole as Role;
 
@@ -23,9 +24,13 @@ export class ProductController {
           ? (req.query.status as ProductStatus | undefined)
           : ProductStatus.ACTIVE;
 
+      // parse the pagination 
+      const { page, limit } = Pagination.from(req.query);
+      
+      // get the products
       const products = await this.productService.read({
-        page: page ? Number(page) : undefined,
-        limit: limit ? Number(limit) : undefined,
+        page,
+        limit,
         status,
         category: category as string | undefined,
         search: search as string | undefined,
@@ -156,6 +161,23 @@ export class ProductController {
             error instanceof Error
               ? error.message
               : "Failed to delete products."
+          )
+        );
+    }
+  };
+
+  // get product detail
+  getDetails = async (req: Request, res: Response) => {
+    const id = req.params.id.toString();
+    try {
+      const result = await this.productService.readOne(id);
+      return res.status(HttpStatus.OK).json(result);
+    } catch (error) {
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json(
+          ApiResponse.error(
+            error instanceof Error ? error.message : "Page not found"
           )
         );
     }
