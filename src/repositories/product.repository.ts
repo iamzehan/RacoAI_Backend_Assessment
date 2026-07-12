@@ -147,6 +147,24 @@ export class ProductRepository {
     };
   };
 
+  // find one product by id (for details)
+  findOne = async (id: string) => {
+    const product = await prisma.product.findFirst({
+      where: {
+        id
+      },
+      include: {
+        categories: {
+          include: {
+            categories: true
+          }
+        },
+        stock: true
+      }
+    });
+    return product;
+  };
+
   // update a product (UPDATE)
   udpateProduct = async (data: ProductData) => {
     // Unpack product data
