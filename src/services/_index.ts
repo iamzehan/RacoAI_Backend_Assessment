@@ -24,8 +24,12 @@ const authService = new AuthService(
   passwordService,
   tokenService
 );
-const productService = new ProductService(productRepository, redisService);
 const categoryService = new CategoryService(categoryRepository);
+const productService = new ProductService(
+  productRepository,
+  categoryService,
+  redisService
+);
 
 // Services collection
 const services = {
