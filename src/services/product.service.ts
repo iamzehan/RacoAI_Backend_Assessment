@@ -2,12 +2,13 @@ import { ProductRepository } from "../repositories/product.repository.js";
 import { ProductData, ProductQuery } from "../types/product.js";
 import { CacheKey } from "../utils/cache-key.js";
 import { CacheTTL } from "../utils/constants.js";
+import { CategoryService } from "./category.service.js";
 import RedisService from "./redis.service.js";
 
 export class ProductService {
-  
   constructor(
     private readonly productRepo: ProductRepository,
+    private readonly categoryService: CategoryService,
     private readonly redis: RedisService
   ) {}
 
@@ -28,25 +29,34 @@ export class ProductService {
    * Get products with optional pagination and status filter.
    */
   read = async (query: ProductQuery = {}) => {
-    // first check the cache
-    const key = CacheKey.products(query);
+    const finalQuery = { ...query };
+
+    // descendant ids based on 
+    if (finalQuery.categoryId) {
+      finalQuery.categoryIds = await this.categoryService.getDescendantIds(
+        finalQuery.categoryId
+      );
+
+      delete finalQuery.categoryId;
+    }
+
+    const key = CacheKey.products(finalQuery);
+
     const cached = await this.redis.get(key);
-    if(cached) {
-      // return cache if found
+
+    if (cached) {
       return cached;
     }
-    // then go to the database for retrieval
-    const products = await this.productRepo.findProducts(query);
+
+    const products = await this.productRepo.findProducts(finalQuery);
     if (products.data.length === 0) {
       throw new Error("No products found.");
     }
-    // now set the cache to redis via redis service
+
     await this.redis.set(key, products, CacheTTL.PRODUCTS);
-    
-    // return results
+
     return products;
   };
-
   /**
    * Get product details
    */

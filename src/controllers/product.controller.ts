@@ -13,7 +13,7 @@ export class ProductController {
    */
   getProducts = async (req: Request, res: Response) => {
     try {
-      let { category, search, sort } = req.query;
+      let { categoryId, search, sort } = req.query;
 
       const userRole = req.userRole as Role;
 
@@ -26,13 +26,15 @@ export class ProductController {
 
       // parse the pagination 
       const { page, limit } = Pagination.from(req.query);
+
+      
       
       // get the products
       const products = await this.productService.read({
         page,
         limit,
         status,
-        category: category as string | undefined,
+        categoryId: categoryId as string | undefined,
         search: search as string | undefined,
         sort: sort as string | undefined
       });

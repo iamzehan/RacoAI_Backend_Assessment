@@ -66,7 +66,7 @@ export class ProductRepository {
     page,
     limit,
     status,
-    category,
+    categoryIds,
     search,
     sort
   }: ProductQuery = {}) => {
@@ -93,14 +93,11 @@ export class ProductRepository {
       ];
     }
 
-    if (category) {
+    if (categoryIds?.length) {
       where.categories = {
         some: {
-          categories: {
-            name: {
-              equals: category,
-              mode: "insensitive"
-            }
+          categoryId: {
+            in: categoryIds
           }
         }
       };
@@ -129,7 +126,9 @@ export class ProductRepository {
         })
       }),
 
-      prisma.product.count({ where })
+      prisma.product.count({
+        where
+      })
     ]);
 
     return {
