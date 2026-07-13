@@ -1,149 +1,224 @@
-// The script & the datasets are AI generated 🤖
+/* 
+!!!!! DISCLAIMER !!!!! AI GENERATED CODE LIVES HERE !!!!!
+* This script was AI generated 🤖 -> The author @iamzehan has nothing to do with it. 
+* The CSV datasets used here are also AI generated -> The author @iamzehan has nothing to do with it.
+*/
 
-import { prisma } from "../config/prisma.js";
+import fs from "fs";
+import path from "path";
+import { parse } from "csv-parse/sync";
+
+import {prisma} from "../config/prisma.js";
+
+import generateSKU from "../utils/generateSKU.js";
+
 import { ProductStatus } from "../generated/prisma/enums.js";
 
-import fs from "node:fs/promises";
-import path from "node:path";
+function readCsv<T>(file: string): T[] {
+  const content = fs.readFileSync(path.join("./src/seeding/data", file), "utf8");
 
-const BATCH = 2000;
+  return parse(content, {
+    columns: true,
+    trim: true,
+    skip_empty_lines: true,
+  }) as T[];
+}
 
-type Category = {
-  id: string;
+type CategoryCSV = {
   name: string;
   description: string;
+  parent: string;
 };
 
-type Product = {
-  id: string;
-  sku: string;
+type ProductCSV = {
   name: string;
   description: string;
   price: string;
-  status: string;
+  status: ProductStatus;
 };
 
-type Stock = {
-  id: string;
+type StockCSV = {
+  product: string;
   quantity: string;
-  productId: string;
 };
 
-type Relation = {
-  productId: string;
-  categoryId: string;
+type CategoryProductCSV = {
+  product: string;
+  category: string;
 };
 
-function parseCSV<T>(text: string): T[] {
-  // Remove UTF-8 BOM if present
-  text = text.replace(/^\uFEFF/, "");
+async function clearDatabase() {
+  console.log("🧹 Clearing database...");
 
-  const lines = text
-    .split(/\r?\n/)
-    .filter(line => line.trim().length > 0);
+  await prisma.categoryOnProducts.deleteMany();
+  await prisma.stock.deleteMany();
+  await prisma.product.deleteMany();
+  await prisma.category.deleteMany();
 
-  const headers = lines[0]
-    .split(",")
-    .map(h => h.trim());
+  console.log("✅ Database cleared");
+}
 
-  return lines.slice(1).map(line => {
-    const values = line
-      .split(",")
-      .map(v => v.trim());
+async function seedCategories() {
+  console.log("📁 Seeding categories...");
 
-    const obj: Record<string, string> = {};
+  const rows = readCsv<CategoryCSV>("categories.csv");
 
-    headers.forEach((header, index) => {
-      obj[header] = values[index] ?? "";
+  // Create all categories first
+  for (const row of rows) {
+    await prisma.category.create({
+      data: {
+        name: row.name,
+        description: row.description || null,
+      },
     });
-
-    return obj as T;
-  });
-}
-
-async function loadCSV<T>(filename: string): Promise<T[]> {
-  const file = path.join(process.cwd(), "/src/seeding/data", filename);
-  const text = await fs.readFile(file, "utf8");
-  return parseCSV<T>(text);
-}
-
-async function insertInBatches<T>(
-  data: T[],
-  fn: (batch: T[]) => Promise<any>
-) {
-  for (let i = 0; i < data.length; i += BATCH) {
-    const batch = data.slice(i, i + BATCH);
-
-    await fn(batch);
-
-    console.log(`${i + batch.length}/${data.length}`);
   }
+
+  // Fetch all categories
+  const categories = await prisma.category.findMany();
+
+  const categoryMap = new Map(
+    categories.map((category) => [category.name, category.id])
+  );
+
+  // Build hierarchy
+  for (const row of rows) {
+    if (!row.parent) continue;
+
+    const parentId = categoryMap.get(row.parent);
+
+    if (!parentId) {
+      throw new Error(
+        `Parent category "${row.parent}" not found for "${row.name}".`
+      );
+    }
+
+    await prisma.category.update({
+      where: {
+        name: row.name,
+      },
+      data: {
+        parentId,
+      },
+    });
+  }
+
+  console.log(`✅ ${rows.length} categories seeded`);
+}
+
+async function seedProducts() {
+  console.log("📦 Seeding products...");
+
+  const rows = readCsv<ProductCSV>("products.csv");
+
+  for (const row of rows) {
+    await prisma.product.create({
+      data: {
+        sku: generateSKU(),
+        name: row.name,
+        description: row.description,
+        price: row.price,
+        status: row.status,
+      },
+    });
+  }
+
+  console.log(`✅ ${rows.length} products seeded`);
+}
+
+async function seedStocks() {
+  console.log("📊 Seeding stock...");
+
+  const rows = readCsv<StockCSV>("stock.csv");
+
+  const products = await prisma.product.findMany();
+
+  const productMap = new Map(
+    products.map((product) => [product.name, product.id])
+  );
+
+  for (const row of rows) {
+    const productId = productMap.get(row.product);
+
+    if (!productId) {
+      throw new Error(`Product "${row.product}" not found.`);
+    }
+
+    await prisma.stock.create({
+      data: {
+        productId,
+        quantity: Number(row.quantity),
+      },
+    });
+  }
+
+  console.log(`✅ ${rows.length} stock records seeded`);
+}
+
+async function seedCategoryRelations() {
+  console.log("🔗 Seeding category relations...");
+
+  const rows = readCsv<CategoryProductCSV>(
+    "categories_on_products.csv"
+  );
+
+  const products = await prisma.product.findMany();
+  const categories = await prisma.category.findMany();
+
+  const productMap = new Map(
+    products.map((product) => [product.name, product.id])
+  );
+
+  const categoryMap = new Map(
+    categories.map((category) => [category.name, category.id])
+  );
+
+  for (const row of rows) {
+    const productId = productMap.get(row.product);
+    const categoryId = categoryMap.get(row.category);
+
+    if (!productId) {
+      throw new Error(`Product "${row.product}" not found.`);
+    }
+
+    if (!categoryId) {
+      throw new Error(`Category "${row.category}" not found.`);
+    }
+
+    await prisma.categoryOnProducts.create({
+      data: {
+        productId,
+        categoryId,
+      },
+    });
+  }
+
+  console.log(`✅ ${rows.length} category relationships seeded`);
 }
 
 async function main() {
-  console.log("Cleaning database...");
+  console.clear();
 
-  await prisma.categoriesOnProducts.deleteMany();
-  await prisma.stock.deleteMany();
-  await prisma.product.deleteMany();
-  await prisma.categories.deleteMany();
+  console.log("==========================================");
+  console.log("🚀 Starting database seed");
+  console.log("==========================================\n");
 
-  console.log("Loading CSV files...");
+  await clearDatabase();
 
-  const categories = await loadCSV<Category>("categories.csv");
-  const products = await loadCSV<Product>("products.csv");
-  const stocks = await loadCSV<Stock>("stock.csv");
-  const relations = await loadCSV<Relation>("categories_on_products.csv");
+  await seedCategories();
+  await seedProducts();
+  await seedStocks();
+  await seedCategoryRelations();
 
-  console.log("Inserting Categories...");
-
-  await insertInBatches(categories, (batch) =>
-    prisma.categories.createMany({
-      data: batch,
-    })
-  );
-
-  console.log("Inserting Products...");
-
-  await insertInBatches(products, (batch) =>
-    prisma.product.createMany({
-      data: batch.map((p) => ({
-        id: p.id,
-        sku: p.sku,
-        name: p.name,
-        description: p.description,
-        price: p.price,
-        status: p.status as ProductStatus,
-      })),
-    })
-  );
-
-  console.log("Inserting Stock...");
-
-  await insertInBatches(stocks, (batch) =>
-    prisma.stock.createMany({
-      data: batch.map((s) => ({
-        id: s.id,
-        quantity: Number(s.quantity),
-        productId: s.productId,
-      })),
-    })
-  );
-
-  console.log("Inserting Relations...");
-
-  await insertInBatches(relations, (batch) =>
-    prisma.categoriesOnProducts.createMany({
-      data: batch,
-      skipDuplicates: true,
-    })
-  );
-
-  console.log("✅ Seeding complete.");
+  console.log("\n==========================================");
+  console.log("🎉 Database seeded successfully");
+  console.log("==========================================");
 }
 
 main()
-  .catch(console.error)
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  })
   .finally(async () => {
     await prisma.$disconnect();
   });
