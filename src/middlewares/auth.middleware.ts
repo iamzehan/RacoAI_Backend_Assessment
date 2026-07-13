@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { TokenService } from "../services/token.service.js";
 import { UserService } from "../services/user.service.js";
 import { HttpStatus } from "../utils/constants.js";
-
+import { Role } from "../generated/prisma/enums.js";
 export class AuthenticationMiddleware {
   constructor(
     private tokenService: TokenService,
@@ -87,7 +87,7 @@ export class AuthenticationMiddleware {
       return res.sendStatus(HttpStatus.UNAUTHORIZED);
     }
 
-    if (user.role !== "admin") {
+    if (user.role !== Role.ADMIN && user.role !== Role.SUPER_ADMIN) {
       return res.sendStatus(HttpStatus.FORBIDDEN);
     }
 
