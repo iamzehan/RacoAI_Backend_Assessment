@@ -7,13 +7,15 @@ export interface ProductQuery {
 
   status?: ProductStatus;
 
-  category?: string;
+  categoryId?: string;
   search?: string;
 
   minPrice?: number;
   maxPrice?: number;
 
   sort?: string;
+
+  categoryIds?: string[]
 }
 
 interface ProductData extends Product {
