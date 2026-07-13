@@ -14,8 +14,14 @@ import generateSKU from "../utils/generateSKU.js";
 
 import { ProductStatus } from "../generated/prisma/enums.js";
 
+const dataDir = path.join(
+  process.cwd(),
+  "src",
+  "seeding",
+  "data"
+);
 function readCsv<T>(file: string): T[] {
-  const content = fs.readFileSync(path.join("./src/seeding/data", file), "utf8");
+  const content = fs.readFileSync(path.join(dataDir, file), "utf8");
 
   return parse(content, {
     columns: true,
