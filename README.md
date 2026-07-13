@@ -221,17 +221,13 @@ This enables unlimited category nesting while keeping the schema simple.
 ```mermaid
 flowchart LR
 
-A[GET /products?category=laptop]
-
-A --> B[Build Category Tree]
-
-B --> C[Depth First Search]
-
-C --> D[Collect Descendant IDs]
-
-D --> E[Repository]
-
-E --> F[WHERE categoryId IN (...)]
+A["GET /products?category=laptop"]
+    --> B["CategoryService.getDescendantIds()"]
+    --> C["Depth-First Search"]
+    --> D["['laptop', 'gaming', 'ultrabook', ...]"]
+    --> E["ProductRepository.findProducts()"]
+    --> F["SQL: WHERE categoryId IN (...)"]
+    --> G["Products Returned"]
 ```
 
 Instead of querying only a single category, the backend expands the selected category into its complete subtree before executing the database query.
