@@ -1,9 +1,7 @@
 import { CategoryRepository } from "../repositories/category.repository.js";
-
+import { CategoryNode, TreeBuilder } from "../utils/tree-builder.js";
 export class CategoryService {
-  constructor(
-    private readonly categoryRepo: CategoryRepository
-  ) {}
+  constructor(private readonly categoryRepo: CategoryRepository) {}
 
   /**
    * Create a category.
@@ -84,17 +82,63 @@ export class CategoryService {
 
   /**
    * Returns the cached category tree.
-   * (Redis implementation will be added later.)
    */
   getTree = async () => {
-    throw new Error("Not implemented.");
+    const categories = await this.categoryRepo.findAll();
+
+    if (categories.length === 0) {
+      throw new Error("No categories found.");
+    }
+
+    return TreeBuilder.build(categories);
   };
 
   /**
+   * Helps find a node from nodes 
+   */
+  private findNode(nodes: CategoryNode[], id: string): CategoryNode | null {
+    for (const node of nodes) {
+      if (node.id === id) {
+        return node;
+      }
+
+      const found = this.findNode(node.children, id);
+
+      if (found) {
+        return found;
+      }
+    }
+
+    return null;
+  }
+
+  /*
+    * DFS(Depth first search) tree traversal to find all related categories 
+  */
+  private dfs(node: CategoryNode, ids: Set<string>) {
+    ids.add(node.id);
+
+    for (const child of node.children) {
+      this.dfs(child, ids);
+    }
+  }
+
+  /**
    * Returns all descendant category IDs using DFS.
-   * (Implemented after Redis/tree builder.)
    */
   getDescendantIds = async (categoryId: string) => {
-    throw new Error("Not implemented.");
+    const tree = await this.getTree();
+
+    const node = this.findNode(tree, categoryId);
+
+    if (!node) {
+      throw new Error("Category not found.");
+    }
+
+    const ids: Set<string> = new Set<string>();
+
+    this.dfs(node, ids);
+
+    return [...ids];
   };
 }
