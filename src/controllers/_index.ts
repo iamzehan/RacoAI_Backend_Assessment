@@ -8,20 +8,23 @@ import { UserController } from "./user.controller.js";
 import { RefreshController } from "./refresh.controller.js";
 import { ProductController } from "./product.controller.js";
 import { CategoryController } from "./category.controller.js";
+import { OrderController } from "./order.controller.js";
 
 // Controllers
 const authController = new AuthController(services.authService);
 const refreshController = new RefreshController(services.authService);
 const userController = new UserController(services.userService);
 const productController = new ProductController(services.productService);
-const categoryController = new CategoryController(services.categoryService)
+const categoryController = new CategoryController(services.categoryService);
+const orderController = new OrderController(services.orderService)
 // Add to controller collection
 const controller = {
   authController,
   refreshController,
   userController,
   productController,
-  categoryController
+  categoryController,
+  orderController
 };
 
 
