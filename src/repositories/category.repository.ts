@@ -6,7 +6,7 @@ export class CategoryRepository {
    * Create a category.
    */
   create = async (data: CreateCategoryDto) => {
-    return prisma.categories.create({
+    return prisma.category.create({
       data: {
         name: data.name,
         description: data.description,
@@ -16,10 +16,10 @@ export class CategoryRepository {
   };
 
   /**
-   * Retrieve all categories.
+   * Retrieve all category.
    */
   findAll = async () => {
-    return prisma.categories.findMany({
+    return prisma.category.findMany({
       orderBy: {
         name: "asc",
       },
@@ -30,7 +30,7 @@ export class CategoryRepository {
    * Retrieve a single category.
    */
   findById = async (id: string) => {
-    return prisma.categories.findUnique({
+    return prisma.category.findUnique({
       where: {
         id,
       },
@@ -41,7 +41,7 @@ export class CategoryRepository {
    * Update a category.
    */
   update = async (data: UpdateCategoryDto) => {
-    return prisma.categories.update({
+    return prisma.category.update({
       where: {
         id: data.id,
       },
@@ -57,7 +57,7 @@ export class CategoryRepository {
    * Delete a category.
    */
   delete = async (id: string) => {
-    return prisma.categories.delete({
+    return prisma.category.delete({
       where: {
         id,
       },

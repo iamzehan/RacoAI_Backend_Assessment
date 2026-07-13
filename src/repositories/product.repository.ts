@@ -39,7 +39,7 @@ export class ProductRepository {
 
       // add categories
       if (categories) {
-        await tx.categoriesOnProducts.createMany({
+        await tx.categoryOnProducts.createMany({
           data: categories.map((category) => ({
             productId: productData.id,
             categoryId: category.id
@@ -172,14 +172,14 @@ export class ProductRepository {
     const updatedProduct = await prisma.$transaction(async (tx) => {
       if (categories) {
         // Delete old categories
-        await tx.categoriesOnProducts.deleteMany({
+        await tx.categoryOnProducts.deleteMany({
           where: {
             productId: productData.id
           }
         });
 
         // Add new categories
-        await tx.categoriesOnProducts.createMany({
+        await tx.categoryOnProducts.createMany({
           data: categories.map((category) => ({
             productId: productData.id,
             categoryId: category.id
