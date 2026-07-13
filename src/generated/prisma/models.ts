@@ -10,7 +10,10 @@
  */
 export type * from './models/User.js'
 export type * from './models/Product.js'
-export type * from './models/Categories.js'
-export type * from './models/CategoriesOnProducts.js'
+export type * from './models/Category.js'
+export type * from './models/CategoryOnProducts.js'
 export type * from './models/Stock.js'
+export type * from './models/Order.js'
+export type * from './models/OrderItem.js'
+export type * from './models/Payment.js'
 export type * from './commonInputTypes.js'

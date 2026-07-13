@@ -17,6 +17,10 @@ model User {
   role      Role     @default(USER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  orders Order[]
+
+  @@index([role])
+  @@index([createdAt])
 }
 
 model Product {
@@ -24,39 +28,45 @@ model Product {
   sku         String                 @unique
   name        String
   description String
-  price       String
+  price       Decimal                @db.Decimal(10,2)
   status      ProductStatus          @default(ACTIVE)
   createdAt   DateTime               @default(now())
   updatedAt   DateTime               @updatedAt
-  categories  CategoriesOnProducts[]
+  categories  CategoryOnProducts[]
   stock       Stock?
+  orderItems OrderItem[]
+
+  @@index([status, createdAt])
+  @@index([price])
+  @@index([name])
 }
 
-model Categories {
+model Category {
   id          String   @id @default(uuid())
   name        String   @unique
   description String?
 
   /// Self-referencing hierarchy
   parentId String?
-  parent   Categories?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
-  children Categories[] @relation("CategoryHierarchy")
+  parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children Category[] @relation("CategoryHierarchy")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  products CategoriesOnProducts[]
+  products CategoryOnProducts[]
 
   @@index([parentId])
 }
 
-model CategoriesOnProducts {
+model CategoryOnProducts {
   productId  String
   categoryId String
-  categories Categories @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categories Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   product    Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@id([productId, categoryId])
+  @@index([categoryId])
 }
 
 model Stock {
@@ -65,6 +75,79 @@ model Stock {
   productId String  @unique
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
+
+model Order {
+  id            String        @id @default(uuid())
+  orderNumber   String        @unique
+
+  userId        String
+  user          User          @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  status        OrderStatus   @default(PENDING)
+
+  subtotal      Decimal       @db.Decimal(10,2)
+  discount      Decimal       @default(0.00) @db.Decimal(10,2)
+  shipping      Decimal       @default(0.00) @db.Decimal(10,2)
+  total         Decimal       @db.Decimal(10,2)
+
+  items         OrderItem[]
+  payment       Payment?
+
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([status])
+  @@index([userId, createdAt])
+}
+
+model OrderItem {
+  id            String      @id @default(uuid())
+
+  orderId       String
+  order         Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  productId     String
+  product       Product     @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  quantity      Int
+
+// price at the time of purchase
+  unitPrice     Decimal     @db.Decimal(10,2)
+
+// snapshot of product name
+  productName   String
+
+// snapshot of SKU
+  sku           String
+
+  subtotal      Decimal     @db.Decimal(10,2)
+
+  @@index([orderId])
+}
+
+model Payment {
+  id                String          @id @default(uuid())
+
+  orderId           String          @unique
+  order             Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  provider          PaymentProvider
+
+  transactionId     String?         @unique
+
+  amount            Decimal         @db.Decimal(10,2)
+
+  status            PaymentStatus   @default(PENDING)
+
+  paidAt            DateTime?
+
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@index([status])
+  @@index([provider])
+}
+
 
 enum Role {
   USER        @map("USER")
@@ -76,7 +159,34 @@ enum Role {
 
 enum ProductStatus {
   ACTIVE   @map("ACTIVE")
-  INACTIVE @map("INACTIVE")
+  DRAFT @map("DRAFT")
+  OUT_OF_STOCK @map("OUT_OF_STOCK")
+  ARCHIVED @map("ARCHIVED")
 
   @@map("product_status_enum")
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum PaymentProvider {
+  STRIPE
+  SSLCOMMERZ
+  BKASH
+  NAGAD
+  CASH_ON_DELIVERY
 }

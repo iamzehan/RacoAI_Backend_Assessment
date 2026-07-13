@@ -50,17 +50,32 @@ export type User = Prisma.UserModel
  */
 export type Product = Prisma.ProductModel
 /**
- * Model Categories
+ * Model Category
  * 
  */
-export type Categories = Prisma.CategoriesModel
+export type Category = Prisma.CategoryModel
 /**
- * Model CategoriesOnProducts
+ * Model CategoryOnProducts
  * 
  */
-export type CategoriesOnProducts = Prisma.CategoriesOnProductsModel
+export type CategoryOnProducts = Prisma.CategoryOnProductsModel
 /**
  * Model Stock
  * 
  */
 export type Stock = Prisma.StockModel
+/**
+ * Model Order
+ * 
+ */
+export type Order = Prisma.OrderModel
+/**
+ * Model OrderItem
+ * 
+ */
+export type OrderItem = Prisma.OrderItemModel
+/**
+ * Model Payment
+ * 
+ */
+export type Payment = Prisma.PaymentModel
