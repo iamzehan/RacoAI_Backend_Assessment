@@ -1,13 +1,13 @@
 import { Prisma } from "../generated/prisma/client.js";
 import { OrderStatus, ProductStatus } from "../generated/prisma/enums.js";
 
-import {OrderRepository} from "../repositories/order.repository.js";
+import { OrderRepository } from "../repositories/order.repository.js";
 import RedisService from "./redis.service.js";
 
 import { CreateOrderData, OrderQuery } from "../types/order.d.js";
 import { CacheKey } from "../utils/cache-key.js";
 import { CacheTTL } from "../utils/constants.js";
-
+import { prisma } from "../config/prisma.js";
 export class OrderService {
   constructor(
     private readonly orderRepo: OrderRepository,
@@ -271,4 +271,59 @@ export class OrderService {
 
     return true;
   };
+
+  async completeOrder(orderId: string) {
+    return prisma.$transaction(async (tx) => {
+      // Get order with items
+      const order = await tx.order.findUnique({
+        where: { id: orderId },
+        include: {
+          items: true
+        }
+      });
+
+      if (!order) {
+        throw new Error("Order not found.");
+      }
+
+      if (order.status === OrderStatus.PAID) {
+        return order;
+      }
+
+      // Reduce stock
+      for (const item of order.items) {
+        const updated = await tx.stock.updateMany({
+          where: {
+            productId: item.productId,
+            quantity: {
+              gte: item.quantity
+            }
+          },
+          data: {
+            quantity: {
+              decrement: item.quantity
+            }
+          }
+        });
+
+        if (updated.count === 0) {
+          throw new Error(
+            `Insufficient stock for product ${item.productName}.`
+          );
+        }
+      }
+
+      // Mark order as paid
+      const completedOrder = await tx.order.update({
+        where: {
+          id: orderId
+        },
+        data: {
+          status: OrderStatus.PAID
+        }
+      });
+
+      return completedOrder;
+    });
+  }
 }

@@ -1,6 +1,6 @@
 // import repositories
 import * as repository from "../repositories/_index.js";
-import { productRepository } from "../repositories/_index.js";
+
 
 // import repositories
 import { UserService } from "./user.service.js";
@@ -10,7 +10,7 @@ import { PasswordService } from "./password.service.js";
 import { ProductService } from "./product.service.js";
 import { CategoryService } from "./category.service.js";
 import { OrderService } from "./order.service.js";
-
+import { PaymentService } from "./payment.service.js";
 import RedisService from "./redis.service.js";
 
 // redis
@@ -27,12 +27,16 @@ const authService = new AuthService(
 );
 const categoryService = new CategoryService(repository.categoryRepository);
 const productService = new ProductService(
-  productRepository,
+  repository.productRepository,
   categoryService,
   redisService
 );
 
+// orders
 const orderService = new OrderService(repository.orderRepository, redisService);
+
+// payment
+const paymentService = new PaymentService(repository.paymentRepository);
 
 // Services collection
 const services = {
@@ -43,7 +47,8 @@ const services = {
   passwordService,
   productService,
   categoryService,
-  orderService
+  orderService,
+  paymentService
 };
 
 export default services;
