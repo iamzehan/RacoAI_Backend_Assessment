@@ -1,8 +1,8 @@
 import { createClient } from "redis";
-
+import { env } from "../config/env.js";
 class RedisService {
   private client = createClient({
-    url: process.env.REDIS_URL,
+    url: env.REDIS_URL,
   });
 
   async connect() {
