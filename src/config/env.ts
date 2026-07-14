@@ -5,19 +5,41 @@ dotenv.config();
 
 const envSchema = z.object({
   PORT: z.string().default("3000"),
-  // environment
+
+  // Environment
   NODE_ENV: z.enum(["development", "production", "test"]),
-  // session
+
+  // Session
   SESSION_SECRET: z.string(),
-  // database
+
+  // Database
   DATABASE_URL: z.string(),
-  // jwt
+
+  // JWT
   JWT_SECRET: z.string(),
   JWT_REFRESH_SECRET: z.string(),
-  // password hashing
+
+  // Password Hashing
   PASSWORD_HASH_SALT: z.string(),
-  // redis
+
+  // Redis
   REDIS_URL: z.string(),
+
+  // Stripe
+  STRIPE_SECRET_KEY: z.string(),
+  STRIPE_WEBHOOK_SECRET: z.string(),
+
+  // bKash
+  BKASH_BASE_URL: z.string().url(),
+  BKASH_USERNAME: z.string(),
+  BKASH_PASSWORD: z.string(),
+  BKASH_APP_KEY: z.string(),
+  BKASH_APP_SECRET: z.string(),
+  BKASH_CALLBACK_URL: z.string().url(),
+
+  // Client and Server URLs
+  CLIENT_URL : z.string().url(),
+  SERVER_URL : z.string().url()
 });
 
 export const env = envSchema.parse(process.env);
