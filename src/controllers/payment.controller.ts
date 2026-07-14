@@ -10,7 +10,16 @@ export class PaymentController {
    */
   create = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const payment = await this.paymentService.initiate(req.body);
+      const userId = req.userId;
+
+      if (!userId) {
+        throw new Error("Unauthorized!");
+      }
+
+      const payment = await this.paymentService.initiate({
+        ...req.body,
+        userId,
+      });
 
       res
         .status(201)
@@ -25,11 +34,18 @@ export class PaymentController {
    */
   verify = async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const userId = req.userId;
+
+      if (!userId) {
+        throw new Error("Unauthorized!");
+      }
+
       const { paymentId, transactionId } = req.body;
 
       const payment = await this.paymentService.verify(
         paymentId,
-        transactionId
+        transactionId,
+        userId
       );
 
       res
@@ -46,8 +62,16 @@ export class PaymentController {
   refund = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { paymentId } = req.params;
+      const userId = req.userId;
 
-      const refund = await this.paymentService.refund(paymentId.toString());
+      if (!userId) {
+        throw new Error("Unauthorized!");
+      }
+
+      const refund = await this.paymentService.refund(
+        paymentId.toString(),
+        userId
+      );
 
       res
         .status(200)
@@ -63,8 +87,16 @@ export class PaymentController {
   readOne = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { paymentId } = req.params;
+      const userId = req.userId;
 
-      const payment = await this.paymentService.read(paymentId.toString());
+      if (!userId) {
+        throw new Error("Unauthorized!");
+      }
+
+      const payment = await this.paymentService.read(
+        paymentId.toString(),
+        userId
+      );
 
       res
         .status(200)

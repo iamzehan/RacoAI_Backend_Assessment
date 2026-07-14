@@ -6,6 +6,7 @@ import { stripe } from "../payment/clients/stripe.client.js";
 import Stripe from "stripe";
 import { env } from "../config/env.js";
 import { OrderService } from "./order.service.js";
+import { Order } from "../generated/prisma/client.js";
 
 export class PaymentService {
   constructor(
@@ -17,10 +18,21 @@ export class PaymentService {
    * Initiate a payment.
    */
   async initiate(data: {
+    userId: string;
     orderId: string;
     provider: PaymentProvider;
     amount: number;
   }) {
+    // Verify order ownership from order table 
+    const order = await this.orderService.readOne({id: data.orderId});
+
+    if (!order) {
+      throw new Error("Order not found.");
+    }
+    if (order.userId !== data.userId) {
+      throw new Error("Unauthorized access.");
+    }
+
     // Create pending payment record
     const payment = await this.paymentRepo.create({
       orderId: data.orderId,
@@ -28,13 +40,13 @@ export class PaymentService {
       amount: data.amount
     });
 
-    // Select the appropriate payment strategy
+    // Select payment strategy
     const strategy = PaymentFactory.create(data.provider);
 
-    // Initiate payment with the provider
+    // Initiate payment with provider
     const response = await strategy.initiatePayment(data.orderId);
 
-    // Save transaction ID if available
+    // Save transaction ID
     if (response.transactionId) {
       await this.paymentRepo.updateTransactionId(
         payment.id,
@@ -48,11 +60,19 @@ export class PaymentService {
   /**
    * Verify a payment.
    */
-  async verify(paymentId: string, transactionId: string) {
-    const payment = await this.paymentRepo.findById(paymentId);
+  async verify(
+    paymentId: string,
+    transactionId: string,
+    userId: string
+  ) {
+    const payment = await this.paymentRepo.findByIdWithOwner(paymentId);
 
     if (!payment) {
       throw new Error("Payment not found.");
+    }
+
+    if (payment.order.userId !== userId) {
+      throw new Error("Unauthorized access.");
     }
 
     const strategy = PaymentFactory.create(payment.provider);
@@ -69,11 +89,15 @@ export class PaymentService {
   /**
    * Refund a payment.
    */
-  async refund(paymentId: string) {
-    const payment = await this.paymentRepo.findById(paymentId);
+  async refund(paymentId: string, userId: string) {
+    const payment = await this.paymentRepo.findByIdWithOwner(paymentId);
 
     if (!payment) {
       throw new Error("Payment not found.");
+    }
+
+    if (payment.order.userId !== userId) {
+      throw new Error("Unauthorized access.");
     }
 
     if (!payment.transactionId) {
@@ -92,11 +116,15 @@ export class PaymentService {
   /**
    * Get payment details.
    */
-  async read(id: string) {
-    const payment = await this.paymentRepo.findById(id);
+  async read(id: string, userId: string) {
+    const payment = await this.paymentRepo.findByIdWithOwner(id);
 
     if (!payment) {
       throw new Error("Payment not found.");
+    }
+
+    if (payment.order.userId !== userId) {
+      throw new Error("Unauthorized access.");
     }
 
     return payment;
@@ -147,6 +175,11 @@ export class PaymentService {
           throw new Error("Payment not found.");
         }
 
+        // Prevent duplicate webhook processing
+        if (payment.status === PaymentStatus.PAID) {
+          return true;
+        }
+
         await this.paymentRepo.markPaid(
           payment.id,
           session.payment_intent as string
@@ -180,12 +213,18 @@ export class PaymentService {
       throw new Error("Payment not found.");
     }
 
+    // Prevent duplicate callbacks
+    if (payment.status === PaymentStatus.PAID) {
+      return true;
+    }
+
     const strategy = PaymentFactory.create(payment.provider);
 
     const result = await strategy.verifyPayment(paymentID);
 
     if (status === "success") {
       await this.paymentRepo.markPaid(payment.id, paymentID);
+
       await this.orderService.completeOrder(payment.orderId);
     } else {
       await this.paymentRepo.markFailed(payment.id);

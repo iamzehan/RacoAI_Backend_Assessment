@@ -1,12 +1,17 @@
 import { Router } from "express";
 import controller from "../../controllers/_index.js";
+import { auth } from "../../middlewares/_index.js";
 
 const paymentRouter = Router();
 
 /**
  * Initiate Payment
  */
-paymentRouter.post("/", controller.paymentController.create);
+paymentRouter.post(
+  "/",
+  auth.requireAuth,
+  controller.paymentController.create
+);
 
 /**
  * Stripe Webhook
@@ -27,13 +32,18 @@ paymentRouter.post(
 /**
  * Verify Payment
  */
-paymentRouter.post("/verify", controller.paymentController.verify);
+paymentRouter.post(
+  "/verify",
+  auth.requireAuth,
+  controller.paymentController.verify
+);
 
 /**
  * Refund Payment
  */
 paymentRouter.post(
   "/:paymentId/refund",
+  auth.requireAuth,
   controller.paymentController.refund
 );
 
@@ -42,6 +52,7 @@ paymentRouter.post(
  */
 paymentRouter.get(
   "/:paymentId",
+  auth.requireAuth,
   controller.paymentController.readOne
 );
 
@@ -50,6 +61,8 @@ paymentRouter.get(
  */
 paymentRouter.patch(
   "/:paymentId/status",
+  auth.requireAuth,
+  auth.ensureAdmin,
   controller.paymentController.updateStatus
 );
 

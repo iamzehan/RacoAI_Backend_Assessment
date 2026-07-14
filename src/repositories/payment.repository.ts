@@ -32,6 +32,24 @@ export class PaymentRepository {
     });
   }
 
+  /*
+    * Find a payment by ID with owner
+  */ 
+  findByIdWithOwner = async (id: string) => {
+    return prisma.payment.findUnique({
+      where: {
+        id
+      },
+      include: {
+        order: {
+          select: {
+            userId: true
+          }
+        }
+      }
+    });
+  };
+
   /**
    * Find a payment by order ID.
    */
