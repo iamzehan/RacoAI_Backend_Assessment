@@ -1,4 +1,4 @@
-import { Prisma } from "../generated/prisma/client.js";
+import { Order, Prisma } from "../generated/prisma/client.js";
 import { OrderStatus, ProductStatus } from "../generated/prisma/enums.js";
 
 import { OrderRepository } from "../repositories/order.repository.js";
@@ -145,11 +145,11 @@ export class OrderService {
   };
 
   // read one order by id
-  private readOneById = async (id: string) => {
+  private readOneById = async (id: string): Promise<Order> => {
     const key = CacheKey.order(id);
 
-    const cached = await this.redis.get(key);
-    if (cached) return cached;
+    const cached = await this.redis.get<string>(key);
+    if (cached) return JSON.parse(cached) as Order;
 
     const order = await this.orderRepo.findById(id);
 
@@ -164,11 +164,13 @@ export class OrderService {
 
   // read by order number
 
-  private readOneByOrderNumber = async (orderNumber: string) => {
+  private readOneByOrderNumber = async (
+    orderNumber: string
+  ): Promise<Order> => {
     const key = CacheKey.orderNum(orderNumber);
 
-    const cached = await this.redis.get(key);
-    if (cached) return cached;
+    const cached = await this.redis.get<string>(key);
+    if (cached) return JSON.parse(cached) as Order;
 
     const order = await this.orderRepo.findByOrderNumber(orderNumber);
 
@@ -192,7 +194,7 @@ export class OrderService {
         return await this.readOneByOrderNumber(orderNumber);
       }
     } catch (error) {
-      return error;
+      throw error;
     }
   };
 
