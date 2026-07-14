@@ -1,7 +1,29 @@
 # RacoAI Backend Assessment
 
-> **A production-oriented E-commerce REST API built with Node.js,
-> Express.js, TypeScript, Prisma ORM, PostgreSQL, and Redis.**
+> **A production-oriented E-commerce REST API built with Node.js and Express**
+
+<p align="left">
+
+<img src="https://img.shields.io/badge/Node.js-22.x-339933?logo=node.js&logoColor=white" />
+<img src="https://img.shields.io/badge/Express.js-5.x-000000?logo=express&logoColor=white" />
+<img src="https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white" />
+<img src="https://img.shields.io/badge/Prisma-ORM-2D3748?logo=prisma&logoColor=white" />
+<img src="https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white" />
+<img src="https://img.shields.io/badge/Redis-Cache-DC382D?logo=redis&logoColor=white" />
+<img src="https://img.shields.io/badge/JWT-Authentication-000000?logo=jsonwebtokens&logoColor=white" />
+<img src="https://img.shields.io/badge/bcrypt-Password%20Hashing-blue" />
+<img src="https://img.shields.io/badge/REST-API-success" />
+<img src="https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white" />
+<img src="https://img.shields.io/badge/Architecture-Layered-blueviolet" />
+<img src="https://img.shields.io/badge/Pattern-Repository-orange" />
+<img src="https://img.shields.io/badge/Pattern-Service-orange" />
+<img src="https://img.shields.io/badge/Pattern-Strategy-orange" />
+<img src="https://img.shields.io/badge/Cache-Redis-red" />
+<img src="https://img.shields.io/badge/License-MIT-green" />
+
+</p>
+
+![Stars](https://img.shields.io/github/stars/iamzehan/RacoAI_Backend_Assessment?style=social) ![Forks](https://img.shields.io/github/forks/iamzehan/RacoAI_Backend_Assessment?style=social) ![Issues](https://img.shields.io/github/issues/iamzehan/RacoAI_Backend_Assessment) ![Last Commit](https://img.shields.io/github/last-commit/iamzehan/RacoAI_Backend_Assessment) ![Repo Size](https://img.shields.io/github/repo-size/iamzehan/RacoAI_Backend_Assessment) ![Top Language](https://img.shields.io/github/languages/top/iamzehan/RacoAI_Backend_Assessment)
 
 Developed as part of the **RacoAI Backend Engineer Assessment**, this
 project demonstrates a scalable backend architecture featuring JWT
@@ -9,29 +31,31 @@ authentication, role-based authorization, Redis caching, hierarchical
 categories, transactional order processing, inventory management, and
 Depth-First Search (DFS) based category filtering.
 
-------------------------------------------------------------------------
+---
 
 # Table of Contents
 
--   Overview
--   Features
--   Technology Stack
--   Architecture
--   Project Structure
--   Category Hierarchy
--   DFS Category Filtering
--   Order Processing
--   Redis Cache Flow
--   API Overview
--   RBAC
--   Getting Started
--   Environment Variables
--   Scripts
--   Design Patterns
--   Key Design Decisions
--   Future Improvements
+- Overview
+- Features
+- Technology Stack
+- Architecture
+- Project Structure
+- Category Hierarchy
+- DFS Category Filtering
+- Order Processing
+- Redis Cache Flow
+- API Overview
+- RBAC
+- Getting Started
+- Environment Variables
+- Scripts
+- Design Patterns
+- Key Design Decisions
+- Future Improvements
+- Payment Architecture
+- Payment Flow
 
-------------------------------------------------------------------------
+---
 
 # Overview
 
@@ -40,84 +64,101 @@ responsibilities across Controllers, Services, and Repositories.
 
 Core features include:
 
--   JWT Authentication
--   Role-Based Access Control (RBAC)
--   Product & Category Management
--   Hierarchical Categories
--   DFS Category Filtering
--   Redis Cache-Aside Strategy
--   Transactional Order Processing
--   Automatic Inventory Updates
--   Pagination, Search & Sorting
+- JWT Authentication
+- Role-Based Access Control (RBAC)
+- Product & Category Management
+- Hierarchical Categories
+- DFS Category Filtering
+- Redis Cache-Aside Strategy
+- Transactional Order Processing
+- Automatic Inventory Updates
+- Pagination, Search & Sorting
 
-------------------------------------------------------------------------
+---
 
 # Features
 
 ## Authentication
 
--   JWT Access & Refresh Tokens
--   HTTP-only Cookies
--   Password Hashing (bcrypt)
--   Role-Based Authorization
+- JWT Access & Refresh Tokens
+- HTTP-only Cookies
+- Password Hashing (bcrypt)
+- Role-Based Authorization
 
 ## Product Management
 
--   CRUD Products
--   SKU Generation
--   Search
--   Pagination
--   Sorting
--   Filtering
--   Redis Caching
+- CRUD Products
+- SKU Generation
+- Search
+- Pagination
+- Sorting
+- Filtering
+- Redis Caching
 
 ## Category Management
 
--   CRUD Categories
--   Unlimited Nested Categories
--   Self-referencing Hierarchy
--   Category Tree Endpoint
+- CRUD Categories
+- Unlimited Nested Categories
+- Self-referencing Hierarchy
+- Category Tree Endpoint
 
 ## Order Management
 
--   Create Orders
--   Multiple Order Items
--   Order Number Generation
--   Stock Validation
--   Automatic Stock Reduction
--   Order Status Updates
--   Order Cancellation
--   Inventory Restoration
--   Prisma Transactions
+- Create Orders
+- Multiple Order Items
+- Order Number Generation
+- Stock Validation
+- Automatic Stock Reduction
+- Order Status Updates
+- Order Cancellation
+- Inventory Restoration
+- Prisma Transactions
+
+## Payment Management
+
+- Strategy Pattern-based Payment Architecture
+- Factory-based Payment Provider Resolution
+- Multiple Payment Provider Support
+  - Stripe
+  - bKash
+- Extensible Payment Gateway Integration
+- Payment Initialization
+- Secure Webhook Verification
+- Idempotent Webhook Processing
+- Payment Status Tracking
+- Order & Payment Synchronization
+- Provider-independent Payment Interface
 
 ## Redis Caching
 
--   Product Lists
--   Product Details
--   Category Tree
--   Order Lists
--   Order Details
+- Product Lists
+- Product Details
+- Category Tree
+- Order Lists
+- Order Details
 
-------------------------------------------------------------------------
+---
 
 # Technology Stack
 
-  Technology   Purpose
-  ------------ ------------------
-  Node.js      Runtime
-  Express.js   REST API
-  TypeScript   Type Safety
-  PostgreSQL   Database
-  Prisma ORM   ORM
-  Redis        Cache
-  JWT          Authentication
-  bcrypt       Password Hashing
+Technology Purpose
 
-------------------------------------------------------------------------
+---
+
+Node.js Runtime
+Express.js REST API
+TypeScript Type Safety
+PostgreSQL Database
+Prisma ORM ORM
+Redis Cache
+JWT Authentication
+bcrypt Password Hashing
+
+---
 
 # Architecture
 
-``` mermaid
+```mermaid
 flowchart TD
 Client --> Router
 Router --> Controller
@@ -128,29 +169,40 @@ Prisma --> PostgreSQL[(PostgreSQL)]
 Service --> Redis[(Redis Cache)]
 ```
 
-------------------------------------------------------------------------
+---
 
 # Project Structure
 
-``` text
+```text
 src/
-├── controllers/
-├── services/
-├── repositories/
-├── routes/
-├── middlewares/
-├── prisma/
-├── generated/
-├── types/
-├── utils/
-└── server.ts
+├── config/          # Environment, Prisma & Session Configuration
+├── controllers/     # HTTP Request Handlers
+├── generated/       # Prisma Generated Client
+│   └── prisma/
+├── middlewares/     # Authentication & Error Handling
+├── payments/        # Payment Strategies & Provider Factory
+│   ├── providers/
+│   ├── factory.ts
+│
+├── prisma/          # Schema & Migrations
+│   └── migrations/
+├── repositories/    # Database Access Layer
+├── routes/          # API Routes
+│   └── v1/
+├── seeding/         # Database Seed Scripts
+│   └── data/
+├── services/        # Business Logic
+├── types/           # TypeScript Definitions
+├── utils/           # Helpers & Utilities
+├── app.ts           # Express Application
+└── server.ts        # Application Entry Point
 ```
 
-------------------------------------------------------------------------
+---
 
 # Category Hierarchy
 
-``` mermaid
+```mermaid
 graph TD
 Electronics --> Laptop
 Electronics --> Phone
@@ -160,11 +212,11 @@ Laptop --> Business
 Laptop --> Ultrabook
 ```
 
-------------------------------------------------------------------------
+---
 
 # DFS Category Filtering
 
-``` mermaid
+```mermaid
 flowchart LR
 A["GET /products?category=laptop"]
 --> B["CategoryService.getDescendantIds()"]
@@ -175,11 +227,11 @@ A["GET /products?category=laptop"]
 --> G["Products Returned"]
 ```
 
-------------------------------------------------------------------------
+---
 
 # Order Processing
 
-``` mermaid
+```mermaid
 flowchart TD
 A["Client Places Order"]
 --> B["Validate Products"]
@@ -196,11 +248,66 @@ Order creation executes inside a single Prisma transaction. If any
 validation or inventory update fails, the transaction is rolled back
 automatically.
 
-------------------------------------------------------------------------
+---
+
+# Payment Architecture
+
+```mermaid
+
+classDiagram
+
+class PaymentStrategy{
+<<interface>>
++createPayment()
++verifyWebhook()
+}
+
+class StripeStrategy
+class SSLCommerzStrategy
+class BKashStrategy
+class NagadStrategy
+class CODStrategy
+
+PaymentStrategy <|.. StripeStrategy
+PaymentStrategy <|.. SSLCommerzStrategy
+PaymentStrategy <|.. BKashStrategy
+PaymentStrategy <|.. NagadStrategy
+PaymentStrategy <|.. CODStrategy
+
+class PaymentFactory{
++resolve(provider)
+}
+
+PaymentFactory --> PaymentStrategy
+
+```
+
+# Payment Flow
+
+```mermaid
+flowchart TD
+
+A["Client Places Order"]
+--> B["Create Pending Order"]
+--> C["Select Payment Provider"]
+--> D["Payment Factory"]
+--> E["Resolve Strategy"]
+--> F["Initialize Payment"]
+--> G["Redirect / Payment Gateway"]
+
+G --> H["Gateway Webhook"]
+
+H --> I["Verify Signature"]
+I --> J["Validate Transaction"]
+J --> K["Idempotency Check"]
+K --> L["Update Payment"]
+L --> M["Update Order Status"]
+M --> N["Return Success"]
+```
 
 # Redis Cache Flow
 
-``` mermaid
+```mermaid
 flowchart TD
 Request --> Cache{Redis}
 Cache -->|Hit| Response
@@ -209,110 +316,168 @@ Database --> Store[Store in Redis]
 Store --> Response
 ```
 
-------------------------------------------------------------------------
+---
 
 # API Overview
 
 ## Authentication
 
--   POST /auth/register
--   POST /auth/login
--   POST /auth/logout
--   POST /auth/refresh
+- POST /auth/register
+- POST /auth/login
+- POST /auth/logout
+- POST /auth/refresh
 
 ## Products
 
--   GET /products
--   GET /products/:id
--   POST /products
--   PATCH /products/:id
--   DELETE /products/:id
+- GET /products
+- GET /products/:id
+- POST /products
+- PATCH /products/:id
+- DELETE /products/:id
 
 ## Categories
 
--   GET /categories
--   GET /categories/tree
--   GET /categories/:id
--   POST /categories
--   PATCH /categories/:id
--   DELETE /categories/:id
+- GET /categories
+- GET /categories/tree
+- GET /categories/:id
+- POST /categories
+- PATCH /categories/:id
+- DELETE /categories/:id
 
 ## Orders
 
--   GET /orders
--   GET /orders/details?id=...
--   GET /orders/details?order_number=...
--   POST /orders
--   PATCH /orders/:id/status
--   PATCH /orders/:id/cancel
--   DELETE /orders/:id
+- GET /orders
+- GET /orders/details?id=...
+- GET /orders/details?order_number=...
+- POST /orders
+- PATCH /orders/:id/status
+- PATCH /orders/:id/cancel
+- DELETE /orders/:id
 
-------------------------------------------------------------------------
+## Payments
+
+- POST /payments/initiate
+- GET /payments/providers
+- GET /payments/:paymentId
+- POST /payments/webhook/:provider
+- GET /payments/callback/:provider
 
 # RBAC
 
-  Endpoint               User   Admin
-  --------------------- ------ -------
-  Create Order            ✅     ✅
-  View Own Orders         ✅     ✅
-  View All Orders         ❌     ✅
-  Update Order Status     ❌     ✅
-  Cancel Order            ✅     ✅
-  Delete Order            ❌     ✅
+Endpoint User Admin
 
-------------------------------------------------------------------------
+---
+
+Create Order ✅ ✅
+View Own Orders ✅ ✅
+View All Orders ❌ ✅
+Update Order Status ❌ ✅
+Cancel Order ✅ ✅
+Delete Order ❌ ✅
+
+---
+
+## Webhook Processing
+
+Every payment provider follows the same verification pipeline:
+
+Verify the webhook signature provided by the payment gateway.
+Validate the transaction amount and order information.
+Perform an idempotency check to prevent duplicate processing.
+Update the payment status.
+Update the associated order.
+Trigger any post-payment operations (inventory confirmation, notifications, etc.).
 
 # Key Design Decisions
 
--   Layered Architecture
--   Repository Pattern
--   Service Pattern
--   Dependency Injection
--   DTO Pattern
--   Cache-Aside Pattern
--   Prisma Transactions for Order Processing
--   DFS traversal for hierarchical category filtering
--   Thin Controllers with centralized error handling
+- Layered Architecture
+- Repository Pattern
+- Service Pattern
+- Dependency Injection
+- DTO Pattern
+- Strategy Pattern for `Payment Providers`
+- Factory Pattern for `Payment Resolution`
+- Cache-Aside Pattern using `Redis`
+- Prisma Transactions for `Order Processing`
+- Idempotent Payment Webhook Processing
+- DFS Traversal for Hierarchical `Category Filtering`
+- Thin Controllers with Centralized Error Handling
 
-------------------------------------------------------------------------
+---
 
 # Environment Variables
 
-``` env
-DATABASE_URL=
-JWT_SECRET=
-JWT_REFRESH_SECRET=
-REDIS_URL=
-PORT=5000
+Create a `.env` file in the project root and configure the following variables:
+
+```env
+# ==========================
+# Application
+# ==========================
 NODE_ENV=development
+PORT=5000
+CLIENT_URL=http://localhost:5173
+
+# ==========================
+# Database
+# ==========================
+DATABASE_URL=postgresql://username:password@localhost:5432/racoai
+
+# ==========================
+# Authentication
+# ==========================
+JWT_SECRET=your_jwt_secret
+JWT_REFRESH_SECRET=your_refresh_secret
+
+# ==========================
+# Session
+# ==========================
+SESSION_SECRET=your_session_secret
+
+# ==========================
+# Redis
+# ==========================
+REDIS_URL=redis://localhost:6379
+
+# ==========================
+# Payment Providers
+# ==========================
+
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
+
+BKASH_USERNAME=
+BKASH_PASSWORD=
+BKASH_APP_KEY=
+BKASH_APP_SECRET=
 ```
 
-------------------------------------------------------------------------
+---
 
 # Scripts
 
--   npm run dev
--   npm run build
--   npm start
--   npm run seed
--   prisma migrate dev
--   prisma generate
+- `npm run dev` - run developement server
+- `npm run build` - build
+- `npm start` - start server
+- `npx prisma db seed` - `seed data`
+- `prisma migrate dev` - `prisma migrate`
+- `prisma generate` - `generate schema`
+- `prisma` - view prisma commands
 
-------------------------------------------------------------------------
+---
 
 # Future Improvements
 
--   Docker
--   CI/CD
--   Swagger/OpenAPI
--   Unit Testing
--   Integration Testing
--   Rate Limiting
--   Background Workers
--   Event-driven Architecture
--   Elasticsearch
+- Docker
+- CI/CD
+- Swagger/OpenAPI
+- Unit Testing
+- Integration Testing
+- Rate Limiting
+- Background Workers
+- Event-driven Architecture
+- Elasticsearch
 
-------------------------------------------------------------------------
+---
 
 # License
 
