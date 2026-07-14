@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { prisma } from "../config/prisma.js";
-import { createClient } from "redis";
-import { env } from "../config/env.js";
+import service from "../services/_index.js";
 
 export class HealthController {
   async check(_req: Request, res: Response) {
@@ -23,13 +22,10 @@ export class HealthController {
 
     // Redis
     try {
-      const client = createClient({
-        url: env.REDIS_URL
-      });
-
-      await client.connect();
-      await client.ping();
-      await client.destroy();
+      const redis = service.redisService;
+      await redis.connect();
+      await redis.ping();
+      await redis.destroy();
 
       services.redis = "healthy";
     } catch {

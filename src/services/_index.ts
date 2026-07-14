@@ -36,7 +36,7 @@ const productService = new ProductService(
 const orderService = new OrderService(repository.orderRepository, redisService);
 
 // payment
-const paymentService = new PaymentService(repository.paymentRepository);
+const paymentService = new PaymentService(repository.paymentRepository, orderService);
 
 // Services collection
 const services = {
