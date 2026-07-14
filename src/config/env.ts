@@ -23,7 +23,8 @@ const envSchema = z.object({
   PASSWORD_HASH_SALT: z.string(),
 
   // Redis
-  REDIS_URL: z.string(),
+  REDIS_HOST: z.string(),
+  REDIS_URL: z.string().url(),
 
   // Stripe
   STRIPE_SECRET_KEY: z.string(),
