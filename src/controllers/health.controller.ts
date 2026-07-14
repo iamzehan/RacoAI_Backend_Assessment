@@ -24,10 +24,10 @@ export class HealthController {
     try {
       const redis = service.redisService;
       await redis.connect();
-      await redis.ping();
+      const result = await redis.ping();
       await redis.destroy();
 
-      services.redis = "healthy";
+      services.redis = result? "healthy" : "unhealthy";
     } catch {
       overallStatus = 503;
     }

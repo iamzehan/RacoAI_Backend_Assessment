@@ -2,7 +2,7 @@ import { createClient } from "redis";
 import { env } from "../config/env.js";
 class RedisService {
   private client = createClient({
-    url: env.REDIS_URL,
+    url: env.REDIS_URL
   });
 
   async connect() {
@@ -20,12 +20,17 @@ class RedisService {
     await this.client.set(key, serialized);
   }
 
-  async destroy(){
+  async destroy() {
     await this.client.destroy();
   }
 
-  async ping() {
-    await this.client.ping();
+  async ping(): Promise<boolean> {
+    try {
+      await this.client.ping();
+      return true;
+    } catch {
+      return false;
+    }
   }
   async get<T>(key: string): Promise<T | null> {
     const value = await this.client.get(key);
