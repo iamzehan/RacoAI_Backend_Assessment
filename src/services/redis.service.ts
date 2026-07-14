@@ -20,6 +20,13 @@ class RedisService {
     await this.client.set(key, serialized);
   }
 
+  async destroy(){
+    await this.client.destroy();
+  }
+
+  async ping() {
+    await this.client.ping();
+  }
   async get<T>(key: string): Promise<T | null> {
     const value = await this.client.get(key);
 
