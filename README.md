@@ -33,28 +33,25 @@ Depth-First Search (DFS) based category filtering.
 
 ---
 
+# 🚀 Getting Started
+
+Head Over to [Getting_Started.md](./Docs/Getting_Started.md) to learn how to setup this project in your local machine. 
+
 # Table of Contents
 
-- Overview
-- Features
-- Technology Stack
-- Architecture
-- Project Structure
-- Category Hierarchy
-- DFS Category Filtering
-- Order Processing
-- Redis Cache Flow
-- API Overview
-- RBAC
-- Getting Started
-- Environment Variables
-- Scripts
-- Design Patterns
-- Key Design Decisions
-- Future Improvements
-- Payment Architecture
-- Payment Flow
-
+| 📘 | 📑 |
+|---|---|
+| [Overview](#overview) | [API Overview](#api-overview) |
+| [Features](#features) | [RBAC](#rbac) |
+| [Technology Stack](#technology-stack) | [Webhook Processing](#webhook-processing) |
+| [Architecture](#architecture) | [Environment Variables](#environment-variables) |
+| [Project Structure](#project-structure) | [Scripts](#scripts) |
+| [Category Hierarchy](#category-hierarchy) | [Key Design Decisions](#key-design-decisions) |
+| [DFS Category Filtering](#dfs-category-filtering) | [License](#license) |
+| [Order Processing](#order-processing) | |
+| [Payment Architecture](#payment-architecture) | |
+| [Payment Flow](#payment-flow) | |
+| [Redis Cache Flow](#redis-cache-flow) | |
 ---
 
 # Overview
@@ -410,45 +407,58 @@ Trigger any post-payment operations (inventory confirmation, notifications, etc.
 Create a `.env` file in the project root and configure the following variables:
 
 ```env
-# ==========================
-# Application
-# ==========================
+# ==========================================
+# Server
+# ==========================================
+PORT=3000
 NODE_ENV=development
-PORT=5000
-CLIENT_URL=http://localhost:5173
 
-# ==========================
-# Database
-# ==========================
-DATABASE_URL=postgresql://username:password@localhost:5432/racoai
+SERVER_URL=http://localhost:3000
+CLIENT_URL=http://localhost:5000
 
-# ==========================
-# Authentication
-# ==========================
-JWT_SECRET=your_jwt_secret
-JWT_REFRESH_SECRET=your_refresh_secret
-
-# ==========================
-# Session
-# ==========================
+# ==========================================
+# Security
+# ==========================================
 SESSION_SECRET=your_session_secret
+PASSWORD_HASH_SALT=12
 
-# ==========================
+JWT_SECRET=your_jwt_secret
+JWT_REFRESH_SECRET=your_jwt_refresh_secret
+
+# ==========================================
+# PostgreSQL
+# ==========================================
+# If PostgreSQL is running on your host machine (Docker development)
+POSTGRES_USER=username
+POSTGRES_PASSWORD=password
+POSTGRES_DB=ecommerce
+DATABASE_URL=postgresql://username:password@host.docker.internal:5433/ecommerce?schema=public
+
+# If PostgreSQL is running in Docker, use:
+# DATABASE_URL=postgresql://username:password@postgres:5432/ecommerce?schema=public
+
+# ==========================================
 # Redis
-# ==========================
-REDIS_URL=redis://localhost:6379
+# ==========================================
+REDIS_HOST=redis
+REDIS_PORT=6379
+REDIS_URL=redis://redis:6379
 
-# ==========================
-# Payment Providers
-# ==========================
+# ==========================================
+# Stripe
+# ==========================================
+STRIPE_SECRET_KEY=sk_test_xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+STRIPE_WEBHOOK_SECRET=whsec_xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-STRIPE_SECRET_KEY=
-STRIPE_WEBHOOK_SECRET=
-
+# ==========================================
+# BKash Sandbox
+# ==========================================
+BKASH_BASE_URL=https://tokenized.sandbox.bka.sh/v1.2.0-beta
 BKASH_USERNAME=
 BKASH_PASSWORD=
 BKASH_APP_KEY=
 BKASH_APP_SECRET=
+BKASH_CALLBACK_URL=http://localhost:3000/api/v1/payments/bkash/callback
 ```
 
 ---
@@ -462,20 +472,6 @@ BKASH_APP_SECRET=
 - `prisma migrate dev` - `prisma migrate`
 - `prisma generate` - `generate schema`
 - `prisma` - view prisma commands
-
----
-
-# Future Improvements
-
-- Docker
-- CI/CD
-- Swagger/OpenAPI
-- Unit Testing
-- Integration Testing
-- Rate Limiting
-- Background Workers
-- Event-driven Architecture
-- Elasticsearch
 
 ---
 
