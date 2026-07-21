@@ -1,12 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import validator from "validator";
-
+import { USERNAME_REGEX, PASSWORD_REGEX } from "../utils/constants.js";
 export class ValidationMiddleware {
-  private readonly usernameRegex =
-    /^(?=.{3,30}$)(?!.*[._]{2})[a-zA-Z0-9]+([._]?[a-zA-Z0-9]+)*$/;
+  private readonly usernameRegex = USERNAME_REGEX;
 
-  private readonly passwordRegex =
-    /^(?=.*[A-Za-z])(?=.*\d).{12,128}$/;
+  private readonly passwordRegex = PASSWORD_REGEX;
 
   private validationFailed(
     res: Response,
