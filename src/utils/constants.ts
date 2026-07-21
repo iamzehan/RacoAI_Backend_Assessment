@@ -36,3 +36,12 @@ export const CacheTTL = {
   USERS: 600,
   USER: 600,
 } as const;
+
+
+// USERNAME & PASSWORD REGEX
+
+export const USERNAME_REGEX =
+  /^(?=.{3,30}$)(?!.*[._]{2})[a-zA-Z0-9]+([._]?[a-zA-Z0-9]+)*$/;
+
+export const PASSWORD_REGEX =
+  /^(?=.*[A-Za-z])(?=.*\d).{12,128}$/;
