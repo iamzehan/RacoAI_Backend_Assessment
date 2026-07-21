@@ -4,8 +4,6 @@ import controller from "../../controllers/_index.js";
 
 const router = Router();
 
-
-
-router.post("/profile/me", auth.requireAuth, controller.userController.getProfile);
+router.get("/profile/me", auth.requireAuth, controller.userController.getProfile);
 
 export default router;
