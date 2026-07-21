@@ -14,35 +14,25 @@ export class AuthService {
 
   //   REGISTER USER
   register = async (data: UserInfo) => {
+    
     // unpack credentials
     const { email, password, username, firstName, lastName } = data;
+
     // Check if email exists
-    const existing = await this.userRepository.findByEmail(email);
-    if (existing) {
+    const existing = await this.userRepository.findExistingUser(email, username);
+    if (existing?.email === email) {
       throw new Error("Email already exists");
     }
-    // If user doesn't exist then create user
+    if (existing?.username === username) {
+      throw new Error("Username already exists");
+    }
+
+    // If user doesn't exist then CREATE USER
 
     // hash password
     const passwordHash = await this.passwordService.hashPassword(password);
     // create new user
     return this.userRepository.createUser({ email, password: passwordHash, username, firstName, lastName });
-  };
-
-  //   UPDATE USER DATA
-  update = async (data: UserInfo) => {
-    // unpack credentials
-    const { email, password, username, firstName, lastName } = data;
-    // Check if email exists
-    const existing = await this.userRepository.findByEmail(email);
-    if (existing) {
-      // hash password
-      const passwordHash = await this.passwordService.hashPassword(password);
-      // create new user
-      return this.userRepository.createUser({ email, password: passwordHash, username, firstName, lastName });
-    } else {
-      throw new Error("Email is not registered");
-    }
   };
 
   //   LOGIN USER
