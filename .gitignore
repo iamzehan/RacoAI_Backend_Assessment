@@ -8,3 +8,5 @@ coverage
 /generated/prisma
 
 /*.pdf
+
+/*.bash
