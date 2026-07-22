@@ -10,7 +10,11 @@ export class AuthenticationMiddleware {
   ) {}
 
   private getToken(req: Request): string | null {
-    return req.headers.authorization?.split(" ")[1] ?? null;
+    const bearer = req.headers.authorization?.split(" ")[1];
+
+    if (bearer) return bearer;
+
+    return req.cookies?.accessToken ?? null;
   }
 
   private verifyToken(req: Request) {

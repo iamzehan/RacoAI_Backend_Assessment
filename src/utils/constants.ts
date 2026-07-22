@@ -44,4 +44,4 @@ export const USERNAME_REGEX =
   /^(?=.{3,30}$)(?!.*[._]{2})[a-zA-Z0-9]+([._]?[a-zA-Z0-9]+)*$/;
 
 export const PASSWORD_REGEX =
-  /^(?=.*[A-Za-z])(?=.*\d).{12,128}$/;
+  /^(?=.*[A-Za-z])(?=.*\d).{8,128}$/;

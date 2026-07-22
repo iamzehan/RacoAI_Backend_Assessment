@@ -22,7 +22,7 @@ services:
       - .:/app
       - /app/node_modules
 
-    command: npm run dev
+    command: sh -c "npm ci && npm run dev"
 
   postgres:
     image: postgres:17-alpine
