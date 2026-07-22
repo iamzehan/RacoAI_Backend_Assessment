@@ -6,13 +6,20 @@ import morgan from "morgan";
 import routes from "./routes/index.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
 import { sessionMiddleware } from "./config/session.js";
+import { env } from "./config/env.js";
+import cookieParser from "cookie-parser";
 
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(sessionMiddleware);
-app.use(cors());
+
+app.use(cookieParser());
+app.use(cors({
+    origin: env.CLIENT_URL,
+    credentials: true
+}));
 app.use(helmet());
 app.use(compression());
 app.use(morgan("dev"));
