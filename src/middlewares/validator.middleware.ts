@@ -75,7 +75,7 @@ export class ValidationMiddleware {
     return value.trim();
   }
 
-  register(req: Request, res: Response, next: NextFunction) {
+  register = (req: Request, res: Response, next: NextFunction) => {
     const { email, username, password, firstName, lastName } = req.body;
 
     const errors: Record<string, string> = {};
@@ -104,9 +104,9 @@ export class ValidationMiddleware {
     req.body.lastName = normalizedLastName;
 
     next();
-  }
+  };
 
-  login(req: Request, res: Response, next: NextFunction) {
+  login = (req: Request, res: Response, next: NextFunction) => {
     const { email, password } = req.body;
 
     const errors: Record<string, string> = {};
@@ -124,10 +124,10 @@ export class ValidationMiddleware {
     req.body.email = normalizedEmail;
 
     next();
-  }
+  };
 
 
-  username(req: Request, res: Response, next: NextFunction) {
+  username = (req: Request, res: Response, next: NextFunction) => {
     const username = req.params.username as string;
 
     const errors: Record<string, string> = {};
@@ -141,5 +141,5 @@ export class ValidationMiddleware {
     req.query.username = normalizedUsername!;
 
     next();
-  }
+  };
 }
