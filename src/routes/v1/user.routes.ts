@@ -11,6 +11,12 @@ router.get(
   controller.userController.getProfile
 );
 
+router.patch(
+  "/profile/me",
+  auth.requireAuth,
+  controller.userController.updateProfile
+);
+
 // This route is for client to check username available ✅ or taken ❌
 router.get(
   "/check-usernames",

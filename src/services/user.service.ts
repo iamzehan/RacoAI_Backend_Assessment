@@ -42,4 +42,35 @@ export class UserService {
     if(!user) throw new Error("User not found!");
     return this.filterResponse(user);
   }
+
+  // update profile
+  updateProfile = async (
+    userId: string,
+    data: {
+      firstName: string;
+      lastName: string;
+      username: string;
+      email: string;
+    }
+  ): Promise<Profile> => {
+    const existing = await this.userRepository.findById(userId);
+    if (!existing) throw new Error("User not found!");
+
+    const conflict = await this.userRepository.findExistingUser(
+      data.email,
+      data.username
+    );
+
+    if (conflict && conflict.id !== userId) {
+      if (conflict.email === data.email) {
+        throw new Error("Email already exists");
+      }
+      if (conflict.username === data.username) {
+        throw new Error("Username already exists");
+      }
+    }
+
+    const updated = await this.userRepository.updateProfile(userId, data);
+    return this.filterResponse(updated);
+  };
 }

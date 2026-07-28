@@ -65,4 +65,24 @@ export class UserRepository {
     });
   }
 
+  // update profile fields by user id
+  async updateProfile(
+    userId: string,
+    data: {
+      firstName: string;
+      lastName: string;
+      username: string;
+      email: string;
+    }
+  ) {
+    return prisma.user.update({
+      where: { id: userId },
+      data: {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        username: data.username,
+        email: data.email
+      }
+    });
+  }
 }

@@ -19,6 +19,39 @@ export class UserController {
     }
   };
 
+  // UPDATE USER PROFILE
+  updateProfile = async (req: Request, res: Response) => {
+    const userId = req.userId;
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
+    const { firstName, lastName, username, email } = req.body;
+    if (!firstName || !lastName || !username || !email) {
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json(ApiResponse.error("All profile fields are required."));
+    }
+
+    try {
+      const profile = await this.userService.updateProfile(userId, {
+        firstName,
+        lastName,
+        username,
+        email
+      });
+      return res
+        .status(HttpStatus.OK)
+        .json(ApiResponse.success("Profile updated successfully.", profile));
+    } catch (error) {
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json(
+          ApiResponse.error(
+            error instanceof Error ? error.message : "Failed to update profile."
+          )
+        );
+    }
+  };
+
   // CHECK FOR AVAILABLE USERNAMES
   getUsernames = async (req: Request, res: Response) => {
     const {username} = req.query;
