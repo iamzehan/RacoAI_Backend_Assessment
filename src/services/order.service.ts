@@ -230,7 +230,7 @@ export class OrderService {
 
   cancel = async (id: string) => {
     return this.orderRepo.transaction(async (tx) => {
-      const order = await this.orderRepo.findById(id);
+      const order = await this.orderRepo.findById(id, tx);
 
       if (!order) {
         throw new Error("Order not found.");
@@ -248,7 +248,7 @@ export class OrderService {
 
       await this.redis.delete(CacheKey.order(id));
 
-      return this.orderRepo.findById(id);
+      return this.orderRepo.findById(id, tx);
     });
   };
 
