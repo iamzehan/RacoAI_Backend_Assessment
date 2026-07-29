@@ -14,6 +14,10 @@ export class OrderService {
     private readonly redis: RedisService
   ) {}
 
+  private invalidateOrderLists = async () => {
+    await this.redis.deleteByPattern("orders:*");
+  };
+
   private generateOrderNumber() {
     const random = Math.random().toString(36).substring(2, 8).toUpperCase();
 
@@ -122,7 +126,9 @@ export class OrderService {
         await this.orderRepo.decreaseStock(item.productId, item.quantity, tx);
       }
 
-      return this.orderRepo.findById(order.id);
+      const createdOrder = await this.orderRepo.findById(order.id, tx);
+      await this.invalidateOrderLists();
+      return createdOrder;
     });
   };
 
@@ -220,6 +226,7 @@ export class OrderService {
     const updated = await this.orderRepo.updateStatus(id, status);
 
     await this.redis.delete(CacheKey.order(id));
+    await this.invalidateOrderLists();
 
     return updated;
   };
@@ -247,6 +254,7 @@ export class OrderService {
       await this.orderRepo.updateStatus(id, OrderStatus.CANCELLED, tx);
 
       await this.redis.delete(CacheKey.order(id));
+      await this.invalidateOrderLists();
 
       return this.orderRepo.findById(id, tx);
     });
@@ -270,6 +278,7 @@ export class OrderService {
     await this.orderRepo.delete(id);
 
     await this.redis.delete(CacheKey.order(id));
+    await this.invalidateOrderLists();
 
     return true;
   };
