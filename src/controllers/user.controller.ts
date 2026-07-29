@@ -2,6 +2,7 @@ import { UserService } from "../services/user.service.js";
 import { Request, Response } from "express";
 import { HttpStatus } from "../utils/constants.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import { Role } from "../generated/prisma/enums.js";
 
 // User Controller
 export class UserController {
@@ -23,6 +24,15 @@ export class UserController {
   updateProfile = async (req: Request, res: Response) => {
     const userId = req.userId;
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
+    if (
+      req.userRole === Role.ADMIN ||
+      req.userRole === Role.SUPER_ADMIN
+    ) {
+      return res
+        .status(HttpStatus.FORBIDDEN)
+        .json(ApiResponse.error("Administrators cannot update their profile."));
+    }
 
     const { firstName, lastName, username, email } = req.body;
     if (!firstName || !lastName || !username || !email) {
@@ -49,6 +59,28 @@ export class UserController {
             error instanceof Error ? error.message : "Failed to update profile."
           )
         );
+    }
+  };
+
+  getAdmins = async (_req: Request, res: Response) => {
+    try {
+      const admins = await this.userService.listAdmins();
+      return res.status(HttpStatus.OK).json(ApiResponse.success("Admins retrieved successfully.", admins));
+    } catch (error) {
+      return res.status(HttpStatus.BAD_REQUEST).json(ApiResponse.error(error instanceof Error ? error.message : "Failed to retrieve admins."));
+    }
+  };
+
+  updateAdminProfile = async (req: Request, res: Response) => {
+    const { firstName, lastName, username, email } = req.body;
+    if (!firstName || !lastName || !username || !email) {
+      return res.status(HttpStatus.BAD_REQUEST).json(ApiResponse.error("All profile fields are required."));
+    }
+    try {
+      const profile = await this.userService.updateAdminProfile(req.params.id.toString(), { firstName, lastName, username, email });
+      return res.status(HttpStatus.OK).json(ApiResponse.success("Admin profile updated successfully.", profile));
+    } catch (error) {
+      return res.status(HttpStatus.BAD_REQUEST).json(ApiResponse.error(error instanceof Error ? error.message : "Failed to update admin profile."));
     }
   };
 
