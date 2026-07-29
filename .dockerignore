@@ -1,0 +1,12 @@
+node_modules
+dist
+build
+Docs
+.agents
+*.pdf
+.git
+.vscode
+.env
+.env.*
+Dockerfile
+docker-compose.yml

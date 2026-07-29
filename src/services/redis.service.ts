@@ -42,6 +42,12 @@ class RedisService {
     await this.client.del(key);
   }
 
+  async deleteByPattern(pattern: string) {
+    for await (const keys of this.client.scanIterator({ MATCH: pattern })) {
+      if (keys.length) await this.client.del(keys);
+    }
+  }
+
   async exists(key: string) {
     return (await this.client.exists(key)) === 1;
   }

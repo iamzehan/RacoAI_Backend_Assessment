@@ -71,7 +71,10 @@ export class CategoryController {
 
   updateCategory = async (req: Request, res: Response) => {
     try {
-      const category = await this.categoryService.update(req.body);
+      const category = await this.categoryService.update({
+        ...req.body,
+        id: req.params.id.toString()
+      });
 
       return res
         .status(HttpStatus.OK)

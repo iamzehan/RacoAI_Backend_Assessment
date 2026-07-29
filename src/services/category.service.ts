@@ -7,6 +7,11 @@ export class CategoryService {
    * Create a category.
    */
   create = async (data: CreateCategoryDto) => {
+    if (data.parentId) {
+      const parent = await this.categoryRepo.findById(data.parentId);
+      if (!parent) throw new Error("Parent category not found.");
+    }
+
     const category = await this.categoryRepo.create(data);
 
     if (!category) {
@@ -52,6 +57,15 @@ export class CategoryService {
   update = async (data: UpdateCategoryDto) => {
     if (!data.id) {
       throw new Error("Category ID is required.");
+    }
+
+    if (data.parentId === data.id) {
+      throw new Error("A category cannot be its own parent.");
+    }
+
+    if (data.parentId) {
+      const parent = await this.categoryRepo.findById(data.parentId);
+      if (!parent) throw new Error("Parent category not found.");
     }
 
     const category = await this.categoryRepo.update(data);

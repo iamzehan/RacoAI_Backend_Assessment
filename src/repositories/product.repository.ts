@@ -89,6 +89,12 @@ export class ProductRepository {
             contains: search,
             mode: "insensitive"
           }
+        },
+        {
+          sku: {
+            contains: search,
+            mode: "insensitive"
+          }
         }
       ];
     }

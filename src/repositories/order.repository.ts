@@ -58,8 +58,8 @@ export class OrderRepository {
   /**
    * Find an order by ID.
    */
-  findById = async (id: string) => {
-    return prisma.order.findUnique({
+  findById = async (id: string, tx?: PrismaTransaction) => {
+    return this.getClient(tx).order.findUnique({
       where: {
         id
       },
