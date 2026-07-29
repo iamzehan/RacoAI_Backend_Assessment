@@ -1,6 +1,7 @@
 // import prisma from config
 import { prisma } from "../config/prisma.js";
 import { UserInfo } from "../types/user.js";
+import { Role } from "../generated/prisma/enums.js";
 // user repo
 export class UserRepository {
   constructor() {}
@@ -42,6 +43,13 @@ export class UserRepository {
       }
     });
     return user;
+  }
+
+  async findAdmins() {
+    return prisma.user.findMany({
+      where: { role: Role.ADMIN },
+      orderBy: { email: "asc" }
+    });
   }
 
   // create user

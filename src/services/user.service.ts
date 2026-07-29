@@ -1,6 +1,7 @@
 import { User } from "../generated/prisma/client.js";
 import { UserRepository } from "../repositories/user.repository.js";
 import { Profile } from "../types/user.js";
+import { Role } from "../generated/prisma/enums.js";
 
 export class UserService {
   constructor(private userRepository: UserRepository) {}
@@ -72,5 +73,21 @@ export class UserService {
 
     const updated = await this.userRepository.updateProfile(userId, data);
     return this.filterResponse(updated);
+  };
+
+  listAdmins = async (): Promise<Profile[]> => {
+    const admins = await this.userRepository.findAdmins();
+    return admins.map((admin) => this.filterResponse(admin));
+  };
+
+  updateAdminProfile = async (
+    adminId: string,
+    data: { firstName: string; lastName: string; username: string; email: string }
+  ): Promise<Profile> => {
+    const admin = await this.userRepository.findById(adminId);
+    if (!admin || admin.role !== Role.ADMIN) {
+      throw new Error("Admin account not found.");
+    }
+    return this.updateProfile(adminId, data);
   };
 }

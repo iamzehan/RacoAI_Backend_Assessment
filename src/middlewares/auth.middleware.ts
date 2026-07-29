@@ -97,4 +97,11 @@ export class AuthenticationMiddleware {
 
     next();
   };
+
+  ensureSuperAdmin = async (req: Request, res: Response, next: NextFunction) => {
+    const user = await this.attachUser(req);
+    if (!user) return res.sendStatus(HttpStatus.UNAUTHORIZED);
+    if (user.role !== Role.SUPER_ADMIN) return res.sendStatus(HttpStatus.FORBIDDEN);
+    next();
+  };
 }

@@ -5,6 +5,9 @@ import { validation } from "../../middlewares/_index.js";
 
 const router = Router();
 
+router.get("/admins", auth.ensureSuperAdmin, controller.userController.getAdmins);
+router.patch("/admins/:id", auth.ensureSuperAdmin, controller.userController.updateAdminProfile);
+
 router.get(
   "/profile/me",
   auth.requireAuth,
