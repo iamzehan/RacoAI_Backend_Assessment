@@ -12,6 +12,11 @@ export class ProductService {
     private readonly redis: RedisService
   ) {}
 
+  private invalidateProductLists = async (id?: string) => {
+    await this.redis.deleteByPattern("products:*");
+    if (id) await this.redis.delete(CacheKey.product(id));
+  };
+
   /**
    * Create a product.
    */
@@ -21,6 +26,8 @@ export class ProductService {
     if (!product) {
       throw new Error("Failed to create product.");
     }
+
+    await this.invalidateProductLists(data.id);
 
     return product;
   };
@@ -96,6 +103,8 @@ export class ProductService {
       throw new Error("Failed to update product.");
     }
 
+    await this.invalidateProductLists(data.id);
+
     return product;
   };
 
@@ -113,6 +122,8 @@ export class ProductService {
       throw new Error("Failed to delete product.");
     }
 
+    await this.invalidateProductLists(id);
+
     return true;
   };
 
@@ -129,6 +140,8 @@ export class ProductService {
     if (result.count === 0) {
       throw new Error("No products were deleted.");
     }
+
+    await this.invalidateProductLists();
 
     return {
       deleted: result.count
