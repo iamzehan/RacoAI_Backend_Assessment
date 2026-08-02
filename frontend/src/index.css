@@ -1,0 +1,95 @@
+@import "tailwindcss";
+
+@import "tailwindcss";
+
+/* Custom variant mapping dark: to [data-theme="dark"] */
+@variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+@theme {
+  --font-sans: "Inter", "Segoe UI", sans-serif;
+  --color-ink: #121826;
+  --color-brand: #5b4bdb;
+  --color-mist: #f7f7fb;
+}
+
+/* ... rest of your CSS stays the same ... */
+
+@layer base {
+  * { box-sizing: border-box; }
+
+  :root,
+  [data-theme="light"] {
+    color-scheme: light;
+    --color-ink: #121826;
+    --color-mist: #f7f7fb;
+    --surface: #ffffff;
+    --surface-muted: #f1f5f9;
+    --border: rgb(226 232 240 / 0.7);
+  }
+
+  [data-theme="dark"] {
+    color-scheme: dark;
+    --color-ink: #e8edf7;
+    --color-mist: #0b1220;
+    --surface: #111827;
+    --surface-muted: #1e293b;
+    --border: rgb(51 65 85 / 0.8);
+  }
+
+  body {
+    @apply m-0 min-w-80 antialiased;
+    background: var(--color-mist);
+    color: var(--color-ink);
+  }
+
+  button, input, select, textarea { font: inherit; }
+  button { @apply cursor-pointer; }
+  :focus-visible { @apply outline-2 outline-offset-2 outline-brand; }
+}
+
+@layer components {
+  .panel {
+    @apply rounded-3xl shadow-sm;
+    border: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .button {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 font-semibold transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .button-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-brand px-4 py-2.5 font-semibold text-white shadow-lg shadow-brand/20 transition hover:-translate-y-0.5 hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .button-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 font-semibold transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50;
+    background: var(--surface-muted);
+    color: var(--color-ink);
+  }
+
+  .field {
+    @apply mt-1 w-full rounded-xl px-3 py-2.5 focus:border-brand focus:outline-none;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--color-ink);
+  }
+
+  .field::placeholder {
+    color: #94a3b8;
+  }
+
+  /* Mobile: form sits on page background; desktop keeps panel treatment */
+  .form-surface {
+    @apply p-1 sm:rounded-3xl sm:border sm:p-7 sm:shadow-sm;
+    border-color: transparent;
+    background: transparent;
+  }
+
+  @media (min-width: 640px) {
+    .form-surface {
+      border: 1px solid var(--border);
+      background: var(--surface);
+    }
+  }
+}
