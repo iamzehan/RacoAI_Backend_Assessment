@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "type": "module",
+  
   "scripts": {
     "dev": "nodemon",
     "build": "rimraf dist && tsc -p tsconfig.build.json",
@@ -15,7 +16,11 @@
     "prisma:migrate": "prisma migrate dev"
   },
   "keywords": [],
-  "author": "",
+  "author": {
+    "name": "Md Ziaul Karim",
+    "github": "https://github.com/iamzehan",
+    "url": "https://ziaulkarim.netlify.app"
+  },
   "license": "ISC",
   "dependencies": {
     "@prisma/adapter-pg": "^7.2.0",
