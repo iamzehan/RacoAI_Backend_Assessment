@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
+  BellIcon,
   ChevronDown,
   LogOut,
   Menu,
@@ -89,13 +90,22 @@ export function Topbar() {
               className="button-secondary relative"
               onClick={() => navigate("/cart")}
             >
-              <ShoppingBag size={17}/>
+              <ShoppingBag size={17} />
               {items.length ? (
                 <span className="rounded-full flex aspect-square text-xs items-center justify-center h-5 p-2 bg-red-400 z-50 text white absolute -right-2 -top-2">
                   {items.length}
                 </span>
-              ): null}
-              {!isMobile? "Cart": null}
+              ) : null}
+              {!isMobile ? "Cart" : null}
+            </button>
+          )}
+          {/* Notification Icon */}
+          {user && !open && (
+            <button
+              className="button-secondary"
+              onClick={() => navigate("/notifications")}
+            >
+              <BellIcon size={17} /> {!isMobile ? "Notifications" : null}
             </button>
           )}
 
@@ -108,7 +118,7 @@ export function Topbar() {
                   </Link>
                 )}
                 <button className="button-primary" onClick={logout}>
-                  <LogOut size={17} /> Sign out
+                  <LogOut size={17} /> Log out
                 </button>
               </>
             ) : (
