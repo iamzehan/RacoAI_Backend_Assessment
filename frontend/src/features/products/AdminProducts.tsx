@@ -112,7 +112,7 @@ export function AdminProducts() {
   useEffect(() => {
     window.scrollTo({
       top: 0,
-      behavior: "smooth" // or "auto" for an instant jump
+      behavior: "instant" // or "auto" for an instant jump
     });
   }, [page]);
 

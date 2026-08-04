@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -50,9 +51,9 @@ export function PopupRenderer() {
           : closePopup
       }
     >
-      <DialogTitle>{popup.title}</DialogTitle>
+      <DialogTitle sx={{fontWeight: "bold"}}>{popup.title}</DialogTitle>
 
-      <DialogContent>
+      <DialogContent color="text.secondary">
 
         {popup.description && (
           <p>{popup.description}</p>
@@ -63,8 +64,8 @@ export function PopupRenderer() {
       </DialogContent>
 
       <DialogActions>
-
-        {popup.actions?.map(
+        {popup.loading && <CircularProgress/>}
+        {!popup.loading && popup.actions?.map(
           (action, index) => (
             <Button
               key={action.label}

@@ -11,7 +11,7 @@ import type {
   AlertOptions,
   ConfirmOptions,
   PopupOptions,
-} from "../types/popup.d.types";
+} from "../types/popup.types";
 
 import { PopupRenderer } from "../components/PopupRenderer";
 
