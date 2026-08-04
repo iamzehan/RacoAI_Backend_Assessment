@@ -1,11 +1,6 @@
 import { createContext, useContext, useMemo, type ReactNode } from "react";
-import {
-  ThemeProvider,
-  createTheme,
-  CssBaseline,
-  type Theme,
-  outlinedInputClasses
-} from "@mui/material";
+import { ThemeProvider, CssBaseline } from "@mui/material";
+import { createTheme, type Theme } from "@mui/material/styles";
 import { useTheme } from "./ThemeContext"; // Your existing Tailwind theme context
 
 const MuiThemeContext = createContext<Theme | null>(null);
@@ -17,7 +12,10 @@ export function MuiThemeProvider({ children }: { children: ReactNode }) {
     () =>
       createTheme({
         palette: {
-          mode: theme
+          mode: theme,
+          brand: {
+            main: "#5b4bdb"
+          }
         },
 
         components: {
