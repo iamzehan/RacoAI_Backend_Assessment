@@ -10,14 +10,14 @@ import { api, type User } from "../api";
 type AuthContextValue = {
   user: User | null;
   login: (email: string, password: string) => Promise<User>;
-  logout: () => void;
+  logout: () => Promise<void>;
   setUser: (user: User | null) => void;
 };
 
 const AuthContext = createContext<AuthContextValue>({
   user: null,
   login: async () => ({ userId: "", email: "" }),
-  logout: () => undefined,
+  logout: async () => undefined,
   setUser: () => undefined
 });
 
@@ -48,7 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(nextUser);
         return nextUser;
       },
-      logout: () => {
+      logout: async () => {
         void api.logout();
         localStorage.removeItem("raco_access_token");
         localStorage.removeItem("raco_user");
