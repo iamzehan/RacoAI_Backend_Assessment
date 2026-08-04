@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Minus, Package, Plus } from "lucide-react";
-import { useCart } from "../../contexts";
+import { useCart } from "../../contexts/_index";
 import { Empty } from "../../components/Empty";
 import { money } from "../../lib/money";
 

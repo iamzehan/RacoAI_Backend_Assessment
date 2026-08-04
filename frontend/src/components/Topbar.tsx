@@ -11,7 +11,7 @@ import {
   UserRound,
   X
 } from "lucide-react";
-import { useAuth, useCart, useRbac, useSidebar } from "../contexts";
+import { useAuth, useCart, useRbac, useSidebar } from "../contexts/_index";
 import { ThemeToggle } from "./ThemeToggle";
 import { useIsMobile } from "../lib/hooks/MediaQuery";
 

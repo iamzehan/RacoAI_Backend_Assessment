@@ -14,7 +14,7 @@ import {
   X,
   BellIcon
 } from "lucide-react";
-import { useAuth, useCart, useRbac, useSidebar } from "../contexts";
+import { useAuth, useCart, useRbac, useSidebar } from "../contexts/_index";
 
 type NavItem = {
   to: string;

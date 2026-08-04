@@ -4,7 +4,7 @@ import { Pencil, Save, X } from "lucide-react";
 import { api, type Profile } from "../../api";
 import { Alert } from "../../components/Alert";
 import { Empty } from "../../components/Empty";
-import { useRbac } from "../../contexts";
+import { useRbac } from "../../contexts/_index";
 
 type FormState = { firstName: string; lastName: string; username: string; email: string };
 

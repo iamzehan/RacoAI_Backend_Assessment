@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { api } from "../../api";
-import { useAuth, useCart } from "../../contexts";
+import { useAuth, useCart } from "../../contexts/_index";
 import { Alert } from "../../components/Alert";
 import { money } from "../../lib/money";
 

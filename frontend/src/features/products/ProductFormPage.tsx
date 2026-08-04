@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Save } from "lucide-react";
 import { api, type Category, type Product } from "../../api";
-import { useRbac } from "../../contexts";
+import { useRbac } from "../../contexts/_index";
 import { Alert } from "../../components/Alert";
 import { FormSkeleton } from "../../components/Skeleton";
 import { invalidateProductCache } from "./productResource";

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
-import { useAuth } from "../../contexts";
+import { useAuth } from "../../contexts/_index";
 import { Alert } from "../../components/Alert";
 import { PasswordField } from "../../components/PasswordField";
 
