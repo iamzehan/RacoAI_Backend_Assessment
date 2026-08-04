@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { ArrowRight, Package, Pencil } from "lucide-react";
 import { api, type Order, type Product } from "../../api";
-import { useRbac } from "../../contexts";
+import { useRbac } from "../../contexts/_index";
 import { Alert } from "../../components/Alert";
 import { Stat } from "../../components/Stat";
 import { StatSkeleton, TableSkeleton } from "../../components/Skeleton";

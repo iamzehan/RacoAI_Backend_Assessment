@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Mail, Package, ShieldCheck } from "lucide-react";
-import { useRbac } from "../contexts";
+import { useRbac } from "../contexts/_index";
 
 export function Footer() {
   const { canAccessAdmin } = useRbac();

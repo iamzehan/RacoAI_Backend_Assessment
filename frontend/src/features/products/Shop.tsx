@@ -1,9 +1,10 @@
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { api, type Category, type Product } from "../../api";
-import { useCart, useRbac } from "../../contexts";
+import { useCart, useRbac, useTheme } from "../../contexts/_index";
 import { Alert } from "../../components/Alert";
 import { Empty } from "../../components/Empty";
 import { ErrorBoundary } from "../../components/ErrorBoundary";
@@ -12,6 +13,12 @@ import { ProductSkeleton } from "./ProductSkeleton";
 import { useProducts } from "./productResource";
 import { Pagination } from "../../components/Pagination";
 import { PageSizeSlider } from "../../components/PageSizeSlider";
+import { useIsMobile } from "../../lib/hooks/MediaQuery";
+
+// MUI materials
+import Autocomplete from "@mui/material/Autocomplete";
+import TextField from "@mui/material/TextField";
+import { createTheme } from "@mui/material/styles";
 
 function ShopHeader({
   search,
@@ -30,6 +37,7 @@ function ShopHeader({
   limit: number;
   onLimitChange: (limit: number) => void;
 }) {
+
   return (
     <div className="flex flex-col justify-between gap-5">
       <div>
@@ -40,7 +48,7 @@ function ShopHeader({
           Find your everyday favourite.
         </h1>
       </div>
-      <div className="flex flex-col md:flex-row gap-2 sm:w-auto">
+      <div className="flex flex-col gap-5 md:flex-row md:gap-2 sm:w-auto">
         <input
           className="field mt-0"
           value={search}
@@ -49,18 +57,22 @@ function ShopHeader({
         />
         {/* Filters */}
         <div className="flex gap-2 w-full flex-col lg:flex-row">
-          <select
-            className="field mt-0 w-full"
-            value={categoryId}
-            onChange={(event) => onCategory(event.target.value)}
-          >
-            <option value="">All categories</option>
-            {categories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.name}
-              </option>
-            ))}
-          </select>
+            <Autocomplete
+            
+              className="w-full"
+              options={categories}
+              value={categories.find((c) => c.id === categoryId) ?? null}
+              onChange={(_, value) => onCategory(value?.id ?? "")}
+              getOptionLabel={(option) => option.name}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Category"
+                  placeholder="All categories"
+                />
+              )}
+            />
           <PageSizeSlider value={limit} onChange={onLimitChange} />
         </div>
       </div>
@@ -87,6 +99,10 @@ function ProductResults({
   const products = response.data;
   const { add } = useCart();
   const grid = useRef<HTMLDivElement>(null);
+  const productCardRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
+
+  gsap.registerPlugin(ScrollTrigger);
 
   useGSAP(
     () => {
@@ -96,15 +112,28 @@ function ProductResults({
       ) {
         return;
       }
-      gsap.from("[data-product-card]", {
-        opacity: 0,
-        y: 18,
-        duration: 0.45,
-        stagger: 0.06,
-        ease: "power2.out"
+
+      const cards = gsap.utils.toArray<HTMLElement>("[data-product-card]");
+
+      cards.forEach((card) => {
+        gsap.from(card, {
+          opacity: 0,
+          y: 40,
+          duration: 0.6,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: card,
+            start: "top 85%",
+            toggleActions: "restart none restart none"
+          }
+        });
       });
     },
-    { scope: grid, dependencies: [products] }
+    {
+      scope: grid,
+      dependencies: [products, isMobile],
+      revertOnUpdate: true
+    }
   );
 
   if (!products.length) {
@@ -132,7 +161,7 @@ function ProductResults({
         className="grid grid-cols-1 gap-5 pt-8 sm:grid-cols-2 lg:grid-cols-3"
       >
         {products.map((product: Product) => (
-          <div data-product-card key={product.id}>
+          <div ref={productCardRef} data-product-card key={product.id}>
             <ProductCard product={product} onAdd={() => add(product)} />
           </div>
         ))}
@@ -187,7 +216,7 @@ export function Shop() {
   useEffect(() => {
     window.scrollTo({
       top: 0,
-      behavior: "smooth"
+      behavior: "instant"
     });
   }, [page]);
 

@@ -3,7 +3,7 @@ import { Navigate, useSearchParams } from "react-router-dom";
 import { api, type Order } from "../../api";
 import { Alert } from "../../components/Alert";
 import { Empty } from "../../components/Empty";
-import { useRbac } from "../../contexts";
+import { useRbac } from "../../contexts/_index";
 import { money } from "../../lib/money";
 import { OrderStatusBadge, type OrderStatus } from "./Badge";
 

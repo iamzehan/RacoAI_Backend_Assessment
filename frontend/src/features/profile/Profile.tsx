@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { Save } from "lucide-react";
 import { api, type Profile } from "../../api";
-import { useAuth, useRbac } from "../../contexts";
+import { useAuth, useRbac } from "../../contexts/_index";
 import { Alert } from "../../components/Alert";
 
 export function ProfilePage() {

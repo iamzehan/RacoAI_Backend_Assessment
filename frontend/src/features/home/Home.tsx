@@ -23,7 +23,7 @@ export function Home() {
   );
 
   return (
-    <div ref={hero}>
+    <div ref={hero} className="min-h-screen">
       <section className="mx-auto grid max-w-7xl gap-12 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:items-center lg:py-28">
         <div>
           <div
@@ -36,7 +36,7 @@ export function Home() {
             data-hero
             className="max-w-xl text-5xl font-black leading-[.98] tracking-tight sm:text-7xl"
           >
-            Thoughtful things for your everyday.
+            Thoughtful things for your everyday needs.
           </h1>
           <p
             data-hero
@@ -78,7 +78,7 @@ export function Home() {
         </div>
       </section>
       <section className="border-y border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900/50">
-        <div className="mx-auto grid max-w-7xl gap-5 px-4 py-10 sm:grid-cols-3 sm:px-6">
+        <div className="mx-auto grid max-w-7xl gap-5 px-4 py-10 grid-cols-1 md:grid-cols-3 sm:px-6">
           <Feature
             icon={<Package />}
             title="Considered selection"

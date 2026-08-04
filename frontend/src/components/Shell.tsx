@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 import { Sidebar } from "./Sidebar";
 import { Topbar } from "./Topbar";
 import { Footer } from "./Footer";
-import { useSidebar } from "../contexts";
+import { useSidebar } from "../contexts/_index";
 import clsx from "clsx";
 
 export function Shell({ children }: { children: React.ReactNode }) {

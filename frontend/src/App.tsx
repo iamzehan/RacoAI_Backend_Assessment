@@ -1,4 +1,4 @@
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { Shell } from "./components/Shell";
 import { AppLoader } from "./components/AppLoader";
@@ -17,7 +17,7 @@ import { ProductFormPage } from "./features/products/ProductFormPage";
 import { AdminOrders } from "./features/orders/AdminOrders";
 import { AdminCategories } from "./features/categories/AdminCategories";
 import { AdminUsers } from "./features/admin/AdminUsers";
-import { useRbac } from "./contexts";
+import { useRbac } from "./contexts/_index";
 
 function RootHome() {
   const { canAccessAdmin } = useRbac();
@@ -25,12 +25,28 @@ function RootHome() {
 }
 
 export default function App() {
-  const [booting, setBooting] = useState(true);
+   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const hasLoaded = localStorage.getItem("app-loaded");
+
+    if (!hasLoaded) {
+      setLoading(true);
+    }
+  }, []);
+
+  const handleLoaderComplete = () => {
+    localStorage.setItem("app-loaded", "true");
+    setLoading(false);
+  };
+
+   if (loading) {
+    return <AppLoader onComplete={handleLoaderComplete} />;
+  }
 
   return (
     <>
-      {booting && <AppLoader onComplete={() => setBooting(false)} />}
-      <div className={booting ? "pointer-events-none opacity-0" : "opacity-100"}>
+      <div className={loading ? "pointer-events-none opacity-0" : "opacity-100"}>
         <Shell>
           <Suspense fallback={null}>
             <Routes>

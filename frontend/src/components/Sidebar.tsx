@@ -11,16 +11,17 @@ import {
   Store,
   UserCircle,
   UserPlus,
-  X
+  X,
+  BellIcon
 } from "lucide-react";
-import { useAuth, useCart, useRbac, useSidebar } from "../contexts";
+import { useAuth, useCart, useRbac, useSidebar } from "../contexts/_index";
 
 type NavItem = {
   to: string;
   label: string;
   icon: ComponentType<{ size?: number }>;
   end?: boolean;
-  badge?: number;
+  badge?: number | null;
   show: boolean;
 };
 
@@ -59,6 +60,13 @@ export function Sidebar() {
           to: "/profile",
           label: "Profile",
           icon: UserCircle,
+          show: Boolean(user) && !canAccessAdmin
+        },
+        {
+          to: "/notifications",
+          label: "Notifications",
+          icon: BellIcon,
+          badge: 0,
           show: Boolean(user) && !canAccessAdmin
         },
         {

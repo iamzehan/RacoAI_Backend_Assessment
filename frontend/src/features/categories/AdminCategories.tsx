@@ -4,7 +4,7 @@ import { Pencil, Plus, Trash2, X } from "lucide-react";
 import { api, type Category } from "../../api";
 import { Alert } from "../../components/Alert";
 import { Empty } from "../../components/Empty";
-import { useRbac } from "../../contexts";
+import { useRbac } from "../../contexts/_index";
 
 type CategoryForm = { name: string; description: string; parentId: string };
 const emptyForm: CategoryForm = { name: "", description: "", parentId: "" };
