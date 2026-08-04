@@ -14,6 +14,8 @@ import {
 import { useAuth, useCart, useRbac, useSidebar } from "../contexts/_index";
 import { ThemeToggle } from "./ThemeToggle";
 import { useIsMobile } from "../lib/hooks/MediaQuery";
+import { usePopup } from "../contexts/PopupContext";
+import { delay } from "../lib/helpers";
 
 export function Topbar() {
   const { user, logout } = useAuth();
@@ -25,6 +27,9 @@ export function Topbar() {
   const { items } = useCart();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+
+  const isSignIn = location.pathname === "/login";
+
   useEffect(() => {
     setMenuOpen(false);
   }, [location.pathname]);
@@ -38,6 +43,38 @@ export function Topbar() {
     document.addEventListener("mousedown", onPointerDown);
     return () => document.removeEventListener("mousedown", onPointerDown);
   }, []);
+
+  // popup loader
+  const { openPopup, closePopup, error } = usePopup();
+
+  const logoutHandler = async () => {
+    openPopup({
+      title: "Signing Out",
+      description: "Please wait while we securely sign you out...",
+      loading: true,
+      closable: false,
+      closeOnBackdrop: false,
+      closeOnEscape: false
+    });
+
+    // Give React and the browser a chance to paint the dialog.
+    await delay(2000);
+
+    try {
+      await logout();
+    } catch {
+      closePopup();
+
+      await error({
+        title: "Logout Failed",
+        description: "Unable to sign you out. Please try again."
+      });
+
+      return;
+    }
+
+    closePopup();
+  };
 
   return (
     <header className="sticky top-0 z-30 border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--surface)_92%,transparent)] backdrop-blur">
@@ -117,15 +154,18 @@ export function Topbar() {
                     <UserRound size={17} /> Profile
                   </Link>
                 )}
-                <button className="button-primary" onClick={logout}>
+                <button
+                  className="button-primary"
+                  onClick={() => logoutHandler()}
+                >
                   <LogOut size={17} /> Log out
                 </button>
               </>
-            ) : (
+            ) : !isSignIn ? (
               <Link className="button-primary" to="/login">
                 Sign in
               </Link>
-            )}
+            ) : null}
           </div>
 
           <div className="relative md:hidden" ref={menuRef}>
@@ -163,7 +203,7 @@ export function Topbar() {
                       className="flex w-full items-center gap-2 px-4 py-2.5 text-sm font-semibold text-rose-600 hover:bg-rose-50"
                       onClick={() => {
                         setMenuOpen(false);
-                        logout();
+                        logoutHandler();
                       }}
                     >
                       <LogOut size={16} /> Log out
