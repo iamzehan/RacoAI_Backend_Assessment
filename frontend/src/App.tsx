@@ -17,7 +17,7 @@ import { ProductFormPage } from "./features/products/ProductFormPage";
 import { AdminOrders } from "./features/orders/AdminOrders";
 import { AdminCategories } from "./features/categories/AdminCategories";
 import { AdminUsers } from "./features/admin/AdminUsers";
-import { useRbac } from "./contexts";
+import { useRbac } from "./contexts/_index";
 
 function RootHome() {
   const { canAccessAdmin } = useRbac();

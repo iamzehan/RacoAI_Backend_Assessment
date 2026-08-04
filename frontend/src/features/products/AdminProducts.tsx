@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { api, type Category, type Product } from "../../api";
-import { useRbac } from "../../contexts";
+import { useRbac } from "../../contexts/_index";
 import { Alert } from "../../components/Alert";
 import { Empty } from "../../components/Empty";
 import { TableSkeleton } from "../../components/Skeleton";
@@ -11,6 +11,7 @@ import { PageSizeSlider } from "../../components/PageSizeSlider";
 import { money } from "../../lib/money";
 import { invalidateProductCache } from "./productResource";
 import { ProductStatusBadge, StockBadge, type ProductStatus } from "./Badge";
+import { usePopup } from "../../contexts/PopupContext";
 
 const STATUSES = ["", "ACTIVE", "DRAFT", "OUT_OF_STOCK", "ARCHIVED"];
 
@@ -39,6 +40,8 @@ export function AdminProducts() {
 
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
+
+  const { confirm } = usePopup();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -118,13 +121,23 @@ export function AdminProducts() {
   }
 
   const remove = async (id: string) => {
-    if (!window.confirm("Delete this product permanently?")) return;
+    const confirmed = await confirm({
+      title: "Delete Product",
+      description:
+        "Are you sure you want to permanently delete this product? This action cannot be undone.",
+
+      confirmText: "Delete",
+      cancelText: "Cancel"
+    });
+
+    if (!confirmed) return;
 
     setDeletingId(id);
     setError("");
 
     try {
       await api.deleteProduct(id);
+
       invalidateProductCache();
 
       if (products.length === 1 && page > 1) {
@@ -135,7 +148,12 @@ export function AdminProducts() {
         );
 
         setPagination((current) =>
-          current ? { ...current, total: current.total - 1 } : current
+          current
+            ? {
+                ...current,
+                total: current.total - 1
+              }
+            : current
         );
       }
     } catch (err) {
@@ -235,7 +253,7 @@ export function AdminProducts() {
                 >
                   <div className="min-w-0">
                     <p className="font-bold">
-                      {product.name} {" "}
+                      {product.name}{" "}
                       <sup>
                         <ProductStatusBadge
                           status={product.status as ProductStatus}
@@ -255,7 +273,6 @@ export function AdminProducts() {
                   <p className="font-bold text-brand">{money(product.price)}</p>
 
                   <div className="flex flex-col w-fit items-center gap-2">
-                  
                     <StockBadge quantity={product.stock?.quantity} />
                   </div>
 
