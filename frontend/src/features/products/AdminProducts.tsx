@@ -12,6 +12,9 @@ import { money } from "../../lib/money";
 import { invalidateProductCache } from "./productResource";
 import { ProductStatusBadge, StockBadge, type ProductStatus } from "./Badge";
 import { usePopup } from "../../contexts/PopupContext";
+import clsx from "clsx";
+import { useIsSticky } from "../../lib/hooks/sticky";
+import { useIsMobile } from "../../lib/hooks/MediaQuery";
 
 const STATUSES = ["", "ACTIVE", "DRAFT", "OUT_OF_STOCK", "ARCHIVED"];
 
@@ -41,6 +44,8 @@ export function AdminProducts() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
 
+  const { ref, isSticky } = useIsSticky<HTMLDivElement>(144);
+  const isMobile = useIsMobile();
   const { confirm } = usePopup();
 
   useEffect(() => {
@@ -181,14 +186,16 @@ export function AdminProducts() {
           </p>
         </div>
 
-        <Link className="button-primary" to="/products/new">
-          <Plus size={16} />
-          Add product
+        {/* Add Product */}
+        <Link className={clsx("button-primary", {"fixed right-2 bottom-30 z-50 p-5": isMobile})} to="/products/new">
+          <Plus size={isMobile? 20: 16} />
+          {!isMobile? "Add product": ""}
         </Link>
       </div>
 
       {/* Filters */}
-      <div className="mt-8 grid gap-2 sm:grid-cols-[1fr_11rem_11rem_11rem]">
+      <div className=
+      "mt-8 grid gap-2 rounded-xl bg-[var(--color-mist)] px-1 py-1 lg:sticky top-20 z-40 sm:grid-cols-[1fr_11rem_11rem_11rem]">
         <input
           className="field mt-0"
           placeholder="Search products"
@@ -196,6 +203,7 @@ export function AdminProducts() {
           onChange={(e) => setSearch(e.target.value)}
         />
 
+        {/* Category filter */}
         <select
           className="field mt-0"
           value={categoryId}
@@ -209,7 +217,7 @@ export function AdminProducts() {
             </option>
           ))}
         </select>
-
+        {/* Status filter */}
         <select
           className="field mt-0"
           value={status}
@@ -223,7 +231,7 @@ export function AdminProducts() {
             </option>
           ))}
         </select>
-
+        {/* Page Items filter */}
         <PageSizeSlider value={limit} onChange={setLimit} />
       </div>
 
@@ -234,9 +242,21 @@ export function AdminProducts() {
         {loading ? (
           <TableSkeleton rows={6} />
         ) : products.length ? (
-          <div className="overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--surface)]">
+          <div className="rounded-3xl border border-[var(--border)] bg-[var(--surface)]">
             {/* Table Header */}
-            <div className="hidden grid-cols-[1.4fr_0.7fr_0.6fr_0.6fr_8rem] gap-3 border-b border-[var(--border)] bg-[var(--surface-muted)] px-5 py-3 text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] md:grid">
+            <div
+              ref={ref}
+              className={clsx(
+                "top-36 z-50 hidden grid-cols-[1.4fr_0.7fr_0.6fr_0.6fr_8rem] border-[var(--border)] transition-all duration-200 ease-in-out",
+                "gap-3 px-5 py-3 text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] md:grid",
+                {
+                  "sticky bg-[var(--color-mist)] border rounded-xl": products.length>1 && isSticky
+                },
+                {
+                  "border-none bg-none": !isSticky
+                }
+              )}
+            >
               <span>Product</span>
               <span>SKU</span>
               <span>Price</span>
